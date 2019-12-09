@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Version>0.0.1</Version>
+    <Authors>Owen</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/1100100/UploadMiddleware</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/1100100/UploadMiddleware</RepositoryUrl>
+    <PackageTags>Upload,UploadMiddleware</PackageTags>
+    <Description>Upload Middleware</Description>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageIconUrl />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UploadMiddleware.Core\UploadMiddleware.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

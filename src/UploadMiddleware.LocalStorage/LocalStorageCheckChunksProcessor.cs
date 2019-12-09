@@ -1,0 +1,54 @@
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using UploadMiddleware.Core;
+using UploadMiddleware.Core.Processors;
+
+namespace UploadMiddleware.LocalStorage
+{
+    public class LocalStorageCheckChunksProcessor : ICheckChunksProcessor
+    {
+        private ChunkedUploadLocalStorageConfigure Configure { get; }
+        public LocalStorageCheckChunksProcessor(ChunkedUploadLocalStorageConfigure configure)
+        {
+            Configure = configure;
+        }
+        public Dictionary<string, string> FormData { get; } = new Dictionary<string, string>();
+        public async Task<ResponseResult> Process()
+        {
+            if (!FormData.TryGetValue(Configure.FileMd5FormName, out var md5) || string.IsNullOrWhiteSpace(md5))
+            {
+                return await Task.FromResult(new ResponseResult
+                {
+                    StatusCode = System.Net.HttpStatusCode.BadRequest,
+                    Content = "{\"errorMsg:\":\"The md5 value of the file cannot be empty.\",\"chunks\":0}"
+                });
+            }
+            if (md5.Length != 32)
+            {
+                return await Task.FromResult(new ResponseResult
+                {
+                    StatusCode = System.Net.HttpStatusCode.BadRequest,
+                    Content = "{\"errorMsg:\":\"不合法的MD5值.\",\"chunks\":0}"
+                });
+            }
+            var dir = Path.Combine(Configure.SaveRootDirectory, "chunks", md5);
+            if (!Directory.Exists(dir))
+            {
+                return await Task.FromResult(new ResponseResult
+                {
+                    Content = "{\"errorMsg:\":\"OK\",\"chunks\":0}"
+                });
+            }
+
+            var dirInfo = new DirectoryInfo(dir);
+            var files = dirInfo.GetFiles();
+            var chunks = files.Length == 0 ? 0 : files.Length - 1;
+            return await Task.FromResult(new ResponseResult
+            {
+                //最后一个文件可能因为中断损坏所以减1
+                Content = $"{{\"errorMsg:\":\"OK\",\"chunks\":{chunks}}}"
+            });
+        }
+    }
+}

@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "defaultProvider": "jsdelivr",
+  "libraries": [
+    {
+      "library": "webuploader@0.1.8",
+      "destination": "wwwroot/lib/webuploader/",
+      "files": [
+        "dist/README.md",
+        "dist/Uploader.swf",
+        "dist/webuploader.css",
+        "dist/webuploader.custom.js",
+        "dist/webuploader.custom.min.js",
+        "dist/webuploader.fis.js",
+        "dist/webuploader.fis.min.js",
+        "dist/webuploader.flashonly.js",
+        "dist/webuploader.flashonly.min.js",
+        "dist/webuploader.html5nodepend.js",
+        "dist/webuploader.html5nodepend.min.js",
+        "dist/webuploader.html5only.js",
+        "dist/webuploader.html5only.min.js",
+        "dist/webuploader.js",
+        "dist/webuploader.min.css",
+        "dist/webuploader.min.js",
+        "dist/webuploader.noimage.js",
+        "dist/webuploader.noimage.min.js",
+        "dist/webuploader.nolog.js",
+        "dist/webuploader.nolog.min.js",
+        "dist/webuploader.withoutimage.js",
+        "dist/webuploader.withoutimage.min.js"
+      ]
+    }
+  ]
+}
