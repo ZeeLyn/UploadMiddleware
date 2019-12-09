@@ -65,7 +65,7 @@ namespace UploadMiddleware.LocalStorage
 
 
 
-            var dir = Path.Combine(Configure.SaveRootDirectory, "chunks", md5);
+            var dir = Path.Combine(Configure.RootDirectory, "chunks", md5);
             if (!Directory.Exists(dir))
             {
                 return await Task.FromResult(new ResponseResult

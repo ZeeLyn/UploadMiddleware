@@ -25,7 +25,7 @@ namespace UploadMiddleware.LocalStorage
         public async Task ProcessFile(Stream fileStream, string extensionName, HttpRequest request, string localFileName, string sectionName)
         {
             var subDir = Configure.SubdirectoryGenerator?.Invoke(request, extensionName) ?? "";
-            var folder = Path.Combine(Configure.SaveRootDirectory, subDir);
+            var folder = Path.Combine(Configure.RootDirectory, subDir);
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
             var fileName = Configure.FileNameGenerator.Invoke(request, extensionName) + extensionName;

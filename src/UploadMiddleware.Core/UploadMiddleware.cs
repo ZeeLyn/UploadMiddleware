@@ -20,11 +20,11 @@ namespace UploadMiddleware.Core
 
         private UploadOptions Options { get; }
 
-        private IValidateFile ValidateFile { get; }
+        private IFileValidator ValidateFile { get; }
 
         private UploadConfigure Configure { get; }
 
-        public UploadMiddleware(RequestDelegate next, IOptions<UploadOptions> options, IValidateFile validateFile, UploadConfigure configure)
+        public UploadMiddleware(RequestDelegate next, IOptions<UploadOptions> options, IFileValidator validateFile, UploadConfigure configure)
         {
             Next = next;
             Options = options.Value;
@@ -39,7 +39,8 @@ namespace UploadMiddleware.Core
                 await Next(context);
                 return;
             }
-            if (!context.Request.Method.Equals("post", StringComparison.CurrentCultureIgnoreCase))
+
+            if (!HttpMethods.IsPost(context.Request.Method))
             {
                 context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                 return;

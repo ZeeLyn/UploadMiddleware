@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using UploadMiddleware.Core;
 using UploadMiddleware.Core.Handlers;
 using UploadMiddleware.Core.Processors;
@@ -10,12 +9,8 @@ namespace UploadMiddleware.LocalStorage
     {
         public LocalStorageConfigure(IServiceCollection services) : base(services)
         {
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        public string SaveRootDirectory { get; set; } = Path.Combine(Directory.GetCurrentDirectory(), "upload");
 
+        }
     }
 
     public class ChunkedUploadLocalStorageConfigure : LocalStorageConfigure

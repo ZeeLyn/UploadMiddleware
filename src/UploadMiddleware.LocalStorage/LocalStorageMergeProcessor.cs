@@ -38,7 +38,7 @@ namespace UploadMiddleware.LocalStorage
             }
 
             var chunks = int.Parse(chunksValue);
-            var chunksDir = Path.Combine(Configure.SaveRootDirectory, "chunks", md5);
+            var chunksDir = Path.Combine(Configure.RootDirectory, "chunks", md5);
             if (!Directory.Exists(chunksDir))
             {
                 throw new ArgumentException("请先上传文件");
@@ -53,7 +53,7 @@ namespace UploadMiddleware.LocalStorage
 
             var extensionName = Path.GetExtension(files.First().Name.Replace(".$chunk", ""));
             var subDir = Configure.SubdirectoryGenerator?.Invoke(request, extensionName) ?? "";
-            var folder = Path.Combine(Configure.SaveRootDirectory, subDir);
+            var folder = Path.Combine(Configure.RootDirectory, subDir);
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
             var fileName = Configure.FileNameGenerator.Invoke(request, extensionName) + extensionName;

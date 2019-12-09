@@ -3,15 +3,15 @@ using System.Threading.Tasks;
 
 namespace UploadMiddleware.Core
 {
-    public interface IValidateFile
+    public interface IFileValidator
     {
         Task<bool> Validate(string fileName, Stream stream);
     }
 
-    public class ValidateFile : IValidateFile
+    public class FileValidator : IFileValidator
     {
         private UploadConfigure Configure { get; }
-        public ValidateFile(UploadConfigure configure)
+        public FileValidator(UploadConfigure configure)
         {
             Configure = configure;
         }

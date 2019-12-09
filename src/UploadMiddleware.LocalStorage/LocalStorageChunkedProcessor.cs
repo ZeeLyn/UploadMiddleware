@@ -42,7 +42,7 @@ namespace UploadMiddleware.LocalStorage
 
             var chunk = int.Parse(chunkValue);
 
-            var chunksFolder = Path.Combine(Configure.SaveRootDirectory, TempFolder, md5);
+            var chunksFolder = Path.Combine(Configure.RootDirectory, TempFolder, md5);
             if (!Directory.Exists(chunksFolder))
                 Directory.CreateDirectory(chunksFolder);
             var fileName = chunk + extensionName + ".$chunk";

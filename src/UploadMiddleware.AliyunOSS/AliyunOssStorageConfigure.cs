@@ -9,7 +9,7 @@ namespace UploadMiddleware.AliyunOSS
     {
         public AliyunOssStorageConfigure(IServiceCollection services) : base(services)
         {
-
+            RootDirectory = "";
         }
 
         /// <summary>
@@ -36,10 +36,6 @@ namespace UploadMiddleware.AliyunOSS
         /// </summary>
         public string SecurityToken { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public string RootDirectory { get; set; }
 
 
         /// <summary>
