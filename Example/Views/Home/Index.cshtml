@@ -6,6 +6,7 @@
     <link href="~/lib/webuploader/dist/webuploader.min.css" rel="stylesheet" />
 }
 <div class="text-center">
+    <h3>分片上传</h3>
     <div id="uploader" class="wu-example">
         <!--用来存放文件信息-->
         <div id="thelist" class="uploader-list"></div>
@@ -77,9 +78,9 @@
 
             uploader.on("uploadBeforeSend", function (block, data, headers) {
                 //console.log(block);
-                uploader.md5File(block.blob).then(function (val) {
-                    console.log(block.chunk + ":" + val);
-                });
+                //uploader.md5File(block.blob).then(function (val) {
+                //    console.log(block.chunk + ":" + val);
+                //});
                 data.md5 = block.file.md5;
                 $.extend(block.file, { chunks: block.chunks });
             });

@@ -20,15 +20,15 @@ namespace UploadMiddleware.Core
 
         private UploadOptions Options { get; }
 
-        private IFileValidator ValidateFile { get; }
+        private IFileValidator FileValidator { get; }
 
         private UploadConfigure Configure { get; }
 
-        public UploadMiddleware(RequestDelegate next, IOptions<UploadOptions> options, IFileValidator validateFile, UploadConfigure configure)
+        public UploadMiddleware(RequestDelegate next, IOptions<UploadOptions> options, IFileValidator fileValidator, UploadConfigure configure)
         {
             Next = next;
             Options = options.Value;
-            ValidateFile = validateFile;
+            FileValidator = fileValidator;
             Configure = configure;
         }
 
@@ -139,75 +139,84 @@ namespace UploadMiddleware.Core
 
                 #region 上传
                 default:
-                    if (!MediaTypeHeaderValue.TryParse(context.Request.ContentType, out var contentType))
+                    try
                     {
-                        context.Response.StatusCode = (int)HttpStatusCode.UnsupportedMediaType;
-                        await context.Response.WriteAsync("ContentType must be multipart/form-data.");
-                        return;
-                    }
-                    if (!contentType.MediaType.Equals("multipart/form-data", StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        context.Response.StatusCode = (int)HttpStatusCode.UnsupportedMediaType;
-                        await context.Response.WriteAsync("ContentType must be multipart/form-data.");
-                        return;
-                    }
-                    var processor = context.RequestServices.GetRequiredService<IUploadProcessor>();
-
-                    foreach (var (key, value) in context.Request.Query)
-                    {
-                        processor.QueryData[key] = value;
-                    }
-                    var boundary = context.Request.GetMultipartBoundary();
-                    var reader = new MultipartReader(boundary, context.Request.Body);
-                    var section = await reader.ReadNextSectionAsync();
-
-                    while (section != null)
-                    {
-                        var header = section.GetContentDispositionHeader();
-                        if (header != null)
+                        if (!MediaTypeHeaderValue.TryParse(context.Request.ContentType, out var contentType))
                         {
-                            if (header.FileName.HasValue || header.FileNameStar.HasValue)
+                            context.Response.StatusCode = (int)HttpStatusCode.UnsupportedMediaType;
+                            await context.Response.WriteAsync("ContentType must be multipart/form-data.");
+                            return;
+                        }
+                        if (!contentType.MediaType.Equals("multipart/form-data", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            context.Response.StatusCode = (int)HttpStatusCode.UnsupportedMediaType;
+                            await context.Response.WriteAsync("ContentType must be multipart/form-data.");
+                            return;
+                        }
+                        var processor = context.RequestServices.GetRequiredService<IUploadProcessor>();
+
+                        foreach (var (key, value) in context.Request.Query)
+                        {
+                            processor.QueryData[key] = value;
+                        }
+                        var boundary = context.Request.GetMultipartBoundary();
+                        var reader = new MultipartReader(boundary, context.Request.Body);
+                        var section = await reader.ReadNextSectionAsync();
+
+                        while (section != null)
+                        {
+                            var header = section.GetContentDispositionHeader();
+                            if (header != null)
                             {
-                                var fileSection = section.AsFileSection();
-                                if (!await ValidateFile.Validate(fileSection.FileName, fileSection.FileStream))
+                                if (header.FileName.HasValue || header.FileNameStar.HasValue)
                                 {
-                                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                                    await context.Response.WriteAsync("Illegal file format.");
-                                    return;
+                                    var fileSection = section.AsFileSection();
+                                    if (!await FileValidator.Validate(fileSection.FileName, fileSection.FileStream))
+                                    {
+                                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                                        await context.Response.WriteAsync("Illegal file format.");
+                                        return;
+                                    }
+                                    var extensionName = Path.GetExtension(fileSection.FileName);
+                                    await processor.ProcessFile(fileSection.FileStream, extensionName, context.Request, fileSection.FileName, fileSection.Name);
                                 }
-                                var extensionName = Path.GetExtension(fileSection.FileName);
-                                await processor.ProcessFile(fileSection.FileStream, extensionName, context.Request, fileSection.FileName, fileSection.Name);
+                                else
+                                {
+                                    var formSection = section.AsFormDataSection();
+                                    processor.FormData[formSection.Name] = await formSection.GetValueAsync();
+                                }
                             }
-                            else
+                            section = await reader.ReadNextSectionAsync();
+                        }
+
+
+                        if (!processor.FileData.Any())
+                        {
+                            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                            context.Response.ContentType = "application/json";
+                            await context.Response.WriteAsync("{\"errorMsg\":\"未发现上传文件\"}");
+                            return;
+                        }
+
+                        var completeHandler = context.RequestServices.GetRequiredService<IUploadCompletedHandler>();
+                        var result = await completeHandler.OnCompleted(processor.FormData, processor.FileData, processor.QueryData, context.Request);
+                        context.Response.StatusCode = (int)result.StatusCode;
+                        context.Response.ContentType = result.ContextType;
+                        if (result.Headers != null && result.Headers.Any())
+                        {
+                            foreach (var (key, value) in result.Headers)
                             {
-                                var formSection = section.AsFormDataSection();
-                                processor.FormData[formSection.Name] = await formSection.GetValueAsync();
+                                context.Response.Headers[key] = value;
                             }
                         }
-                        section = await reader.ReadNextSectionAsync();
+                        await context.Response.WriteAsync(result.Content);
                     }
-
-
-                    if (!processor.FileData.Any())
+                    catch (Exception e)
                     {
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         context.Response.ContentType = "application/json";
-                        await context.Response.WriteAsync("{\"errorMsg\":\"未发现上传文件\"}");
-                        return;
+                        await context.Response.WriteAsync($"{{\"errorMsg\":\"{e.Message}\"}}");
                     }
-
-                    var completeHandler = context.RequestServices.GetRequiredService<IUploadCompletedHandler>();
-                    var result = await completeHandler.OnCompleted(processor.FormData, processor.FileData, processor.QueryData, context.Request);
-                    context.Response.StatusCode = (int)result.StatusCode;
-                    context.Response.ContentType = result.ContextType;
-                    if (result.Headers != null && result.Headers.Any())
-                    {
-                        foreach (var (key, value) in result.Headers)
-                        {
-                            context.Response.Headers[key] = value;
-                        }
-                    }
-                    await context.Response.WriteAsync(result.Content);
                     break;
                     #endregion
             }

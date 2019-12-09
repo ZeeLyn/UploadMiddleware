@@ -21,7 +21,7 @@ namespace UploadMiddleware.Core
         private long _multipartBodyLengthLimit;
 
         /// <summary>
-        /// 允许上传的Body上限
+        /// 允许上传的Body上限,Kestrel服务下才起作用
         /// </summary>
         public long MultipartBodyLengthLimit
         {
@@ -52,7 +52,7 @@ namespace UploadMiddleware.Core
         public Func<HttpRequest, string, string> SubdirectoryGenerator { get; set; } //= (request, extensionName) => Path.Combine(DateTime.Now.ToString("yyyyMMdd"), "img");
 
         /// <summary>
-        /// 文件名生成器
+        /// 文件名生成器（默认以返回GUID）
         /// </summary>
         public Func<HttpRequest, string, string> FileNameGenerator { get; set; } =
            (request, extensionName) => Guid.NewGuid().ToString("N");
@@ -63,12 +63,12 @@ namespace UploadMiddleware.Core
         public Func<HttpContext, bool> AuthorizationFilter { get; set; }
 
         /// <summary>
-        /// 缓冲池大小
+        /// 缓冲池大小（默认1MB）
         /// </summary>
         public int BufferSize { get; set; } = 1024 * 1024;
 
         /// <summary>
-        /// 添加自定义上传完成结果组装Handler
+        /// 添加自定义(文件/分片)上传完成结果组装Handler
         /// </summary>
         /// <typeparam name="TUploadCompletedHandler"></typeparam>
         /// <returns></returns>

@@ -18,14 +18,29 @@ namespace UploadMiddleware.LocalStorage
         public ChunkedUploadLocalStorageConfigure(IServiceCollection services) : base(services)
         {
         }
+        /// <summary>
+        /// 传输分片数量的表单name（默认：chunks）
+        /// </summary>
         public string ChunksFormName { get; set; } = "chunks";
 
+        /// <summary>
+        /// 传输分片索引的表单name,分片索引从0开始（默认：chunk）
+        /// </summary>
         public string ChunkFormName { get; set; } = "chunk";
 
+        /// <summary>
+        /// 传输文件的MD5值的表单name，注意是文件不是分片(默认：md5)
+        /// </summary>
         public string FileMd5FormName { get; set; } = "md5";
 
+        /// <summary>
+        /// 传输分片的MD5值的表单name（默认：chunk_md5）
+        /// </summary>
         public string ChunkMd5FormName { get; set; } = "chunk_md5";
 
+        /// <summary>
+        /// 当分片合并完成时，是否删除分片，(默认：True)
+        /// </summary>
         public bool DeleteChunksOnMerged { get; set; } = true;
 
         /// <summary>

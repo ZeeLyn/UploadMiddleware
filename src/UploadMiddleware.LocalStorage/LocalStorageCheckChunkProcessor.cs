@@ -12,6 +12,7 @@ namespace UploadMiddleware.LocalStorage
 {
     public class LocalStorageCheckChunkProcessor : ICheckChunkProcessor
     {
+        private static readonly MD5 Md5 = MD5.Create();
         private ChunkedUploadLocalStorageConfigure Configure { get; }
         public LocalStorageCheckChunkProcessor(ChunkedUploadLocalStorageConfigure configure)
         {
@@ -103,8 +104,7 @@ namespace UploadMiddleware.LocalStorage
             await using var fs = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.Read);
             var bufferSize = 1048576;
             var buff = new byte[bufferSize];
-            var md5 = new MD5CryptoServiceProvider();
-            md5.Initialize();
+            Md5.Initialize();
             long offset = 0;
             while (offset < fs.Length)
             {
@@ -113,16 +113,15 @@ namespace UploadMiddleware.LocalStorage
                     readSize = fs.Length - offset;
                 fs.Read(buff, 0, Convert.ToInt32(readSize));
                 if (offset + readSize < fs.Length)
-                    md5.TransformBlock(buff, 0, Convert.ToInt32(readSize), buff, 0);
+                    Md5.TransformBlock(buff, 0, Convert.ToInt32(readSize), buff, 0);
                 else
-                    md5.TransformFinalBlock(buff, 0, Convert.ToInt32(readSize));
+                    Md5.TransformFinalBlock(buff, 0, Convert.ToInt32(readSize));
                 offset += bufferSize;
             }
             if (offset >= fs.Length)
             {
-                fs.Close();
-                var result = md5.Hash;
-                md5.Clear();
+                var result = Md5.Hash;
+                //Md5.Clear();
                 var sb = new StringBuilder(32);
                 foreach (var t in result)
                     sb.Append(t.ToString("X2"));

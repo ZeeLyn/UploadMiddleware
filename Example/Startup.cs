@@ -35,8 +35,6 @@ namespace Example
                 options.AllowFileExtension.Add(".zip");
                 options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
                 options.DeleteChunksOnMerged = false;
-
-
             });
 
             //services.AddUploadAliyunOSS(options =>
