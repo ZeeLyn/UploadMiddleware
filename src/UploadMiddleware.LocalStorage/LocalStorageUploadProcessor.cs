@@ -31,11 +31,11 @@ namespace UploadMiddleware.LocalStorage
 
         public async Task ProcessFile(Stream fileStream, string extensionName, HttpRequest request, string localFileName, string sectionName)
         {
-            var subDir = await SubdirectoryGenerator.Generate(FormData, QueryData, request, extensionName, sectionName);
+            var subDir = await SubdirectoryGenerator.Generate(FormData, QueryData, request, extensionName);
             var folder = Path.Combine(Configure.RootDirectory, subDir);
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
-            var fileName = await FileNameGenerator.Generate(FormData, QueryData, request, extensionName, sectionName) + extensionName;
+            var fileName = await FileNameGenerator.Generate(FormData, QueryData, request, extensionName) + extensionName;
             var url = Path.Combine(folder, fileName);
             await using var writeStream = File.Create(url);
             if (fileStream.CanSeek && fileStream.Position != 0)

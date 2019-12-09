@@ -23,7 +23,7 @@ namespace UploadMiddleware.Core
         private long _multipartBodyLengthLimit;
 
         /// <summary>
-        /// 允许上传的Body上限,Kestrel服务下才起作用
+        /// Multipart Body的上限,Kestrel服务下才起作用,IIS下请在web.config里配置
         /// </summary>
         public long MultipartBodyLengthLimit
         {
@@ -44,7 +44,7 @@ namespace UploadMiddleware.Core
         public string RootDirectory { get; set; } = Path.Combine(Directory.GetCurrentDirectory(), "upload");
 
         /// <summary>
-        /// 允许上传的文件格式
+        /// 允许上传的文件格式(以"."开头)
         /// </summary>
         public HashSet<string> AllowFileExtension { get; } = new HashSet<string> { ".jpg", ".jpeg", ".png", ".gif" };
 
@@ -85,7 +85,7 @@ namespace UploadMiddleware.Core
         /// <returns></returns>
         public IServiceCollection AddFileValidator<TFileValidator>() where TFileValidator : IFileValidator
         {
-            return Services.AddScoped(typeof(IFileValidator), typeof(TFileValidator));
+            return Services.AddSingleton(typeof(IFileValidator), typeof(TFileValidator));
         }
 
         /// <summary>

@@ -8,7 +8,7 @@ namespace UploadMiddleware.Core.Generators
 {
     public class FileNameGenerator : IFileNameGenerator
     {
-        public async Task<string> Generate(Dictionary<string, string> formData, Dictionary<string, string> queryData, HttpRequest request, string extensionName, string sectionName)
+        public async Task<string> Generate(Dictionary<string, string> formData, Dictionary<string, string> queryData, HttpRequest request, string extensionName)
         {
             return await Task.FromResult(Guid.NewGuid().ToString("N"));
         }
