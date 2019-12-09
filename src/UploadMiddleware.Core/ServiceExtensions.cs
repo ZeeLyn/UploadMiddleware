@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using UploadMiddleware.Core.Generators;
 using UploadMiddleware.Core.Handlers;
 using UploadMiddleware.Core.Processors;
 
@@ -12,8 +13,8 @@ namespace UploadMiddleware.Core
             //默认上传结束handler
             services.AddScoped<IUploadCompletedHandler, UploadCompletedHandler>();
             services.AddSingleton<IFileValidator, FileValidator>();
-            //services.AddSingleton<UploadConfigure>(configure);
-
+            services.AddSingleton<IFileNameGenerator, FileNameGenerator>();
+            services.AddSingleton<ISubdirectoryGenerator, SubdirectoryGenerator>();
             return services;
         }
     }

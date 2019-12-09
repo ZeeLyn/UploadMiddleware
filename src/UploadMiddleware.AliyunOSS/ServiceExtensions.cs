@@ -10,7 +10,7 @@ namespace UploadMiddleware.AliyunOSS
     {
         public static IServiceCollection AddUploadAliyunOSS(this IServiceCollection services, Action<AliyunOssStorageConfigure> options)
         {
-            services.AddUpload<AliyunOssStorageProcessor>();
+            services.AddUpload<AliyunOssStorageUploadProcessor>();
             var config = new AliyunOssStorageConfigure(services);
             options?.Invoke(config);
             services.AddSingleton(config);

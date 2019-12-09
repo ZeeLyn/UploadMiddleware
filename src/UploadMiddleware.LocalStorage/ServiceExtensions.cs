@@ -10,7 +10,7 @@ namespace UploadMiddleware.LocalStorage
     {
         public static IServiceCollection AddUploadLocalStorage(this IServiceCollection services, Action<LocalStorageConfigure> options)
         {
-            services.AddUpload<LocalStorageProcessor>();
+            services.AddUpload<LocalStorageUploadProcessor>();
             var config = new LocalStorageConfigure(services);
             options?.Invoke(config);
             services.AddSingleton<UploadConfigure>(config);
@@ -25,7 +25,7 @@ namespace UploadMiddleware.LocalStorage
 
         public static IServiceCollection AddChunkedUploadLocalStorage(this IServiceCollection services, Action<ChunkedUploadLocalStorageConfigure> options)
         {
-            services.AddUpload<LocalStorageChunkedProcessor>();
+            services.AddUpload<LocalStorageChunkedUploadProcessor>();
             services.AddScoped(typeof(IMergeHandler), typeof(MergeHandler));
             services.AddScoped<ICheckChunksProcessor, LocalStorageCheckChunksProcessor>();
             services.AddScoped<ICheckChunkProcessor, LocalStorageCheckChunkProcessor>();

@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using UploadMiddleware.Core.Generators;
 using UploadMiddleware.Core.Processors;
 
 namespace UploadMiddleware.LocalStorage
@@ -12,9 +13,15 @@ namespace UploadMiddleware.LocalStorage
     {
         private ChunkedUploadLocalStorageConfigure Configure { get; }
 
-        public LocalStorageMergeProcessor(ChunkedUploadLocalStorageConfigure configure)
+        private IFileNameGenerator FileNameGenerator { get; }
+
+        private ISubdirectoryGenerator SubdirectoryGenerator { get; }
+
+        public LocalStorageMergeProcessor(ChunkedUploadLocalStorageConfigure configure, IFileNameGenerator fileNameGenerator, ISubdirectoryGenerator subdirectoryGenerator)
         {
             Configure = configure;
+            FileNameGenerator = fileNameGenerator;
+            SubdirectoryGenerator = subdirectoryGenerator;
         }
 
         public Dictionary<string, string> FormData { get; } = new Dictionary<string, string>();
@@ -52,11 +59,11 @@ namespace UploadMiddleware.LocalStorage
             }
 
             var extensionName = Path.GetExtension(files.First().Name.Replace(".$chunk", ""));
-            var subDir = Configure.SubdirectoryGenerator?.Invoke(request, extensionName) ?? "";
+            var subDir = await SubdirectoryGenerator.Generate(FormData, QueryData, request, extensionName, "");
             var folder = Path.Combine(Configure.RootDirectory, subDir);
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
-            var fileName = Configure.FileNameGenerator.Invoke(request, extensionName) + extensionName;
+            var fileName = await FileNameGenerator.Generate(FormData, QueryData, request, extensionName, "") + extensionName;
             var url = Path.Combine(folder, fileName);
             await using var writeStream = new FileStream(url, FileMode.Append);
             {

@@ -4,6 +4,7 @@ using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
+using UploadMiddleware.Core.Generators;
 using UploadMiddleware.Core.Handlers;
 using UploadMiddleware.Core.Processors;
 
@@ -15,6 +16,7 @@ namespace UploadMiddleware.Core
         {
             Services = services;
         }
+
         protected internal IServiceCollection Services { get; }
 
 
@@ -45,17 +47,6 @@ namespace UploadMiddleware.Core
         /// 允许上传的文件格式
         /// </summary>
         public HashSet<string> AllowFileExtension { get; } = new HashSet<string> { ".jpg", ".jpeg", ".png", ".gif" };
-
-        /// <summary>
-        /// 子目录名生成器
-        /// </summary>
-        public Func<HttpRequest, string, string> SubdirectoryGenerator { get; set; } //= (request, extensionName) => Path.Combine(DateTime.Now.ToString("yyyyMMdd"), "img");
-
-        /// <summary>
-        /// 文件名生成器（默认以返回GUID）
-        /// </summary>
-        public Func<HttpRequest, string, string> FileNameGenerator { get; set; } =
-           (request, extensionName) => Guid.NewGuid().ToString("N");
 
         /// <summary>
         /// 授权过滤器
@@ -97,5 +88,24 @@ namespace UploadMiddleware.Core
             return Services.AddScoped(typeof(IFileValidator), typeof(TFileValidator));
         }
 
+        /// <summary>
+        /// 添加目录生成器
+        /// </summary>
+        /// <typeparam name="TSubdirectoryGenerator"></typeparam>
+        /// <returns></returns>
+        public IServiceCollection AddSubdirectoryGenerator<TSubdirectoryGenerator>() where TSubdirectoryGenerator : ISubdirectoryGenerator
+        {
+            return Services.AddSingleton(typeof(ISubdirectoryGenerator), typeof(TSubdirectoryGenerator));
+        }
+
+        /// <summary>
+        /// 添加文件名生成器
+        /// </summary>
+        /// <typeparam name="TFileNameGenerator"></typeparam>
+        /// <returns></returns>
+        public IServiceCollection AddFileNameGenerator<TFileNameGenerator>() where TFileNameGenerator : IFileNameGenerator
+        {
+            return Services.AddSingleton(typeof(IFileNameGenerator), typeof(TFileNameGenerator));
+        }
     }
 }

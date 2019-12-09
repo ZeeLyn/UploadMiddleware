@@ -4,11 +4,12 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using UploadMiddleware.Core;
+using UploadMiddleware.Core.Generators;
 using UploadMiddleware.Core.Processors;
 
 namespace UploadMiddleware.LocalStorage
 {
-    public class LocalStorageChunkedProcessor : IUploadProcessor
+    public class LocalStorageChunkedUploadProcessor : IUploadProcessor
     {
         public Dictionary<string, string> FormData { get; } = new Dictionary<string, string>();
 
@@ -20,7 +21,7 @@ namespace UploadMiddleware.LocalStorage
 
         private const string TempFolder = "chunks";
 
-        public LocalStorageChunkedProcessor(ChunkedUploadLocalStorageConfigure configure)
+        public LocalStorageChunkedUploadProcessor(ChunkedUploadLocalStorageConfigure configure)
         {
             Configure = configure;
         }
@@ -48,6 +49,8 @@ namespace UploadMiddleware.LocalStorage
             var fileName = chunk + extensionName + ".$chunk";
             var url = Path.Combine(chunksFolder, fileName);
             await using var writeStream = new FileStream(url, FileMode.Create);
+            if (fileStream.CanSeek && fileStream.Position != 0)
+                fileStream.Seek(0, SeekOrigin.Begin);
             await fileStream.CopyToAsync(writeStream, Configure.BufferSize);
             FileData.Add(new UploadFileResult { Name = sectionName, Url = Path.Combine("/", TempFolder, md5, fileName).Replace("\\", "/") });
         }

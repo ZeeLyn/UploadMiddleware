@@ -27,15 +27,15 @@ namespace Example
             services.AddUploadLocalStorage(options =>
             {
                 options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
-                options.AddUploadCompletedHandler<CustomUploadCompletedHandler>();
+                //options.AddUploadCompletedHandler<CustomUploadCompletedHandler>();
             });
 
-            services.AddChunkedUploadLocalStorage(options =>
-            {
-                options.AllowFileExtension.Add(".zip");
-                options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
-                options.DeleteChunksOnMerged = false;
-            });
+            //services.AddChunkedUploadLocalStorage(options =>
+            //{
+            //    options.AllowFileExtension.Add(".zip");
+            //    options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
+            //    options.DeleteChunksOnMerged = true;
+            //});
 
             //services.AddUploadAliyunOSS(options =>
             //{
