@@ -76,7 +76,7 @@ namespace UploadMiddleware.LocalStorage
             if (Configure.DeleteChunksOnMerged)
                 Directory.Delete(chunksDir, true);
 
-            return Path.Combine(subDir, fileName).Replace("\\", "/");
+            return Path.Combine("/", subDir, fileName).Replace("\\", "/");
         }
     }
 }

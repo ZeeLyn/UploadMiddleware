@@ -10,6 +10,7 @@ using Example.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
+using UploadMiddleware.Core.Common;
 
 namespace Example.Controllers
 {

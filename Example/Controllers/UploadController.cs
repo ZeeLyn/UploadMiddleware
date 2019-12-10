@@ -14,7 +14,7 @@ namespace Example.Controllers
         [HttpPost("upload")]
         public IActionResult Upload()
         {
-            return Ok();
+            return Ok(1);
         }
     }
 }

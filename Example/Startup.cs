@@ -23,29 +23,29 @@ namespace Example
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(options => { options.Filters.Add<GlobalFilter>(); });
             services.AddUploadLocalStorage(options =>
             {
                 options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
-
+                options.AllowFileExtension.Add(".mp4");
                 //options.AddUploadCompletedHandler<CustomUploadCompletedHandler>();
             });
 
-            services.AddChunkedUploadLocalStorage(options =>
-            {
-                options.AllowFileExtension.Add(".zip");
-                options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
-                options.DeleteChunksOnMerged = true;
-            });
+            //services.AddChunkedUploadLocalStorage(options =>
+            //{
+            //    options.AllowFileExtension.Add(".zip");
+            //    options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
+            //    options.DeleteChunksOnMerged = true;
+            //});
 
-            services.AddUploadAliyunOSS(options =>
-            {
-                options.AccessId = Configuration.GetSection("OSS:AccessId").Value;
-                options.AccessKeySecret = Configuration.GetSection("OSS:AccessKeySecret").Value;
-                options.BucketName = Configuration.GetSection("OSS:BucketName").Value;
-                options.Endpoint = Configuration.GetSection("OSS:Endpoint").Value;
-                options.RootDirectory = Configuration.GetSection("OSS:RootDirectory").Value;
-            });
+            //services.AddUploadAliyunOSS(options =>
+            //{
+            //    options.AccessId = Configuration.GetSection("OSS:AccessId").Value;
+            //    options.AccessKeySecret = Configuration.GetSection("OSS:AccessKeySecret").Value;
+            //    options.BucketName = Configuration.GetSection("OSS:BucketName").Value;
+            //    options.Endpoint = Configuration.GetSection("OSS:Endpoint").Value;
+            //    options.RootDirectory = Configuration.GetSection("OSS:RootDirectory").Value;
+            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -96,8 +96,12 @@
                     },
                     success: function (res) {
                         console.log(res);
+                        alert(JSON.stringify(res));
                     }
                 });
+            });
+            uploader.on("uploadFinished", function () {
+                uploader.reset();
             });
 
             $("#ctlBtn").click(function () {

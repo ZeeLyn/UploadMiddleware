@@ -18,6 +18,12 @@ namespace UploadMiddleware.LocalStorage
         public ChunkedUploadLocalStorageConfigure(IServiceCollection services) : base(services)
         {
         }
+
+        /// <summary>
+        /// 存放分片的跟目录，不设置则默认使用RootDirectory
+        /// </summary>
+        public string ChunksRootDirectory { get; set; }
+
         /// <summary>
         /// 传输分片数量的表单name（默认：chunks）
         /// </summary>

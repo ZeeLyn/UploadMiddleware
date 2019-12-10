@@ -12,7 +12,7 @@ namespace Example
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            context.Result = new StatusCodeResult((int)HttpStatusCode.Forbidden);
+            //context.Result = new StatusCodeResult((int)HttpStatusCode.Forbidden);
             return;
         }
     }

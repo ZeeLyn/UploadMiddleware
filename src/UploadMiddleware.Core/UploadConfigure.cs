@@ -46,7 +46,7 @@ namespace UploadMiddleware.Core
         /// <summary>
         /// 允许上传的文件格式(以"."开头)
         /// </summary>
-        public HashSet<string> AllowFileExtension { get; } = new HashSet<string> { ".jpg", ".jpeg", ".png", ".gif" };
+        public HashSet<string> AllowFileExtension { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".gif" };
 
         /// <summary>
         /// 授权过滤器
@@ -54,9 +54,9 @@ namespace UploadMiddleware.Core
         public Func<HttpContext, bool> AuthorizationFilter { get; set; }
 
         /// <summary>
-        /// 缓冲池大小（默认1MB）
+        /// 缓冲池大小（默认64KB）
         /// </summary>
-        public int BufferSize { get; set; } = 1024 * 1024;
+        public int BufferSize { get; set; } = 1024 * 64;
 
         /// <summary>
         /// 添加自定义(文件/分片)上传完成结果组装Handler

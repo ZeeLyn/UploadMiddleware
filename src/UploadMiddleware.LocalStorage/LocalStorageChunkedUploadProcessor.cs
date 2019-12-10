@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using UploadMiddleware.Core;
-using UploadMiddleware.Core.Generators;
 using UploadMiddleware.Core.Processors;
 
 namespace UploadMiddleware.LocalStorage
@@ -19,14 +18,17 @@ namespace UploadMiddleware.LocalStorage
 
         private ChunkedUploadLocalStorageConfigure Configure { get; }
 
+        private IFileValidator FileValidator { get; }
+
         private const string TempFolder = "chunks";
 
-        public LocalStorageChunkedUploadProcessor(ChunkedUploadLocalStorageConfigure configure)
+        public LocalStorageChunkedUploadProcessor(ChunkedUploadLocalStorageConfigure configure, IFileValidator fileValidator)
         {
             Configure = configure;
+            FileValidator = fileValidator;
         }
 
-        public async Task ProcessFile(Stream fileStream, string extensionName, HttpRequest request, string localFileName,
+        public async Task<(bool Success, string ErrorMessage)> ProcessFile(Stream fileStream, string extensionName, HttpRequest request, string localFileName,
             string sectionName)
         {
             if (!FormData.TryGetValue(Configure.FileMd5FormName, out var md5))
@@ -43,16 +45,27 @@ namespace UploadMiddleware.LocalStorage
 
             var chunk = int.Parse(chunkValue);
 
+            byte[] signature = null;
+            //只验证第一个分片
+            if (chunk == 0)
+            {
+                var (success, fileSignature) = await FileValidator.Validate(localFileName, fileStream);
+                if (!success)
+                    return (false, "Illegal file format.");
+                signature = fileSignature;
+            }
+
             var chunksFolder = Path.Combine(Configure.RootDirectory, TempFolder, md5);
             if (!Directory.Exists(chunksFolder))
                 Directory.CreateDirectory(chunksFolder);
             var fileName = chunk + extensionName + ".$chunk";
             var url = Path.Combine(chunksFolder, fileName);
             await using var writeStream = new FileStream(url, FileMode.Create);
-            if (fileStream.CanSeek && fileStream.Position != 0)
-                fileStream.Seek(0, SeekOrigin.Begin);
+            if (signature != null && signature.Length > 0)
+                writeStream.Write(signature, 0, signature.Length);
             await fileStream.CopyToAsync(writeStream, Configure.BufferSize);
             FileData.Add(new UploadFileResult { Name = sectionName, Url = Path.Combine("/", TempFolder, md5, fileName).Replace("\\", "/") });
+            return (true, "");
         }
     }
 }

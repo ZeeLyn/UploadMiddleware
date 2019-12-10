@@ -32,6 +32,8 @@ namespace UploadMiddleware.LocalStorage
             services.AddScoped<IMergeProcessor, LocalStorageMergeProcessor>();
             var config = new ChunkedUploadLocalStorageConfigure(services);
             options?.Invoke(config);
+            if (string.IsNullOrWhiteSpace(config.RootDirectory))
+                throw new ArgumentNullException(nameof(config.RootDirectory));
             if (string.IsNullOrWhiteSpace(config.ChunkFormName))
                 throw new ArgumentNullException(config.ChunkFormName);
             if (string.IsNullOrWhiteSpace(config.ChunksFormName))

@@ -52,6 +52,8 @@ namespace UploadMiddleware.Core
                 return;
             }
 
+            //await Next(context);
+
             context.Request.Query.TryGetValue("action", out var action);
 
             switch (action.ToString().ToLower())
@@ -171,12 +173,6 @@ namespace UploadMiddleware.Core
                                 if (header.FileName.HasValue || header.FileNameStar.HasValue)
                                 {
                                     var fileSection = section.AsFileSection();
-                                    if (!await FileValidator.Validate(fileSection.FileName, fileSection.FileStream))
-                                    {
-                                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                                        await context.Response.WriteAsync("Illegal file format.");
-                                        return;
-                                    }
                                     var extensionName = Path.GetExtension(fileSection.FileName);
                                     await processor.ProcessFile(fileSection.FileStream, extensionName, context.Request, fileSection.FileName, fileSection.Name);
                                 }

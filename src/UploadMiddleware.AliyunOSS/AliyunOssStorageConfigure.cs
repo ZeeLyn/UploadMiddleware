@@ -37,7 +37,7 @@ namespace UploadMiddleware.AliyunOSS
         public string SecurityToken { get; set; }
 
         /// <summary>
-        /// 设置文件的HTTP头，每种文件格式可以单独配置,可使用以下占位符:
+        /// 设置文件的元数据，每种文件格式可以单独配置,可使用以下占位符:
         /// $(form:name):   表单数据，name是具体的form表单key;
         /// $(query:name):   query参数，name是具体的query参数key;
         /// $LocalFileName:  本地文件名;

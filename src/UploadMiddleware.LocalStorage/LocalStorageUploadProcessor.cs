@@ -16,11 +16,14 @@ namespace UploadMiddleware.LocalStorage
 
         private ISubdirectoryGenerator SubdirectoryGenerator { get; }
 
-        public LocalStorageUploadProcessor(LocalStorageConfigure configure, IFileNameGenerator fileNameGenerator, ISubdirectoryGenerator subdirectoryGenerator)
+        private IFileValidator FileValidator { get; }
+
+        public LocalStorageUploadProcessor(LocalStorageConfigure configure, IFileNameGenerator fileNameGenerator, ISubdirectoryGenerator subdirectoryGenerator, IFileValidator fileValidator)
         {
             Configure = configure;
             FileNameGenerator = fileNameGenerator;
             SubdirectoryGenerator = subdirectoryGenerator;
+            FileValidator = fileValidator;
         }
 
         public Dictionary<string, string> FormData { get; } = new Dictionary<string, string>();
@@ -29,8 +32,11 @@ namespace UploadMiddleware.LocalStorage
 
         public Dictionary<string, string> QueryData { get; } = new Dictionary<string, string>();
 
-        public async Task ProcessFile(Stream fileStream, string extensionName, HttpRequest request, string localFileName, string sectionName)
+        public async Task<(bool Success, string ErrorMessage)> ProcessFile(Stream fileStream, string extensionName, HttpRequest request, string localFileName, string sectionName)
         {
+            var (success, fileSignature) = await FileValidator.Validate(localFileName, fileStream);
+            if (!success)
+                return (false, "Illegal file format.");
             var subDir = await SubdirectoryGenerator.Generate(FormData, QueryData, request, extensionName);
             var folder = Path.Combine(Configure.RootDirectory, subDir);
             if (!Directory.Exists(folder))
@@ -38,10 +44,11 @@ namespace UploadMiddleware.LocalStorage
             var fileName = await FileNameGenerator.Generate(FormData, QueryData, request, extensionName) + extensionName;
             var url = Path.Combine(folder, fileName);
             await using var writeStream = File.Create(url);
-            if (fileStream.CanSeek && fileStream.Position != 0)
-                fileStream.Seek(0, SeekOrigin.Begin);
+            if (fileSignature != null && fileSignature.Length > 0)
+                writeStream.Write(fileSignature, 0, fileSignature.Length);
             await fileStream.CopyToAsync(writeStream, Configure.BufferSize);
             FileData.Add(new UploadFileResult { Name = sectionName, Url = Path.Combine("/", subDir, fileName).Replace("\\", "/") });
+            return (true, "");
         }
     }
 }

@@ -13,7 +13,7 @@ namespace UploadMiddleware.Core.Processors
 
         Dictionary<string, string> QueryData { get; }
 
-        Task ProcessFile(Stream fileStream, string extensionName, HttpRequest request, string localFileName, string sectionName);
+        Task<(bool Success, string ErrorMessage)> ProcessFile(Stream fileStream, string extensionName, HttpRequest request, string localFileName, string sectionName);
 
     }
 }
