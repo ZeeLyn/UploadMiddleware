@@ -39,9 +39,9 @@ namespace UploadMiddleware.AliyunOSS
 
         public async Task<(bool Success, string ErrorMessage)> Process(Stream fileStream, string extensionName, HttpRequest request, string localFileName, string sectionName)
         {
-            var (success, fileSignature) = await FileValidator.Validate(localFileName, fileStream);
+            var (success, errorMsg, fileSignature) = await FileValidator.Validate(localFileName, fileStream);
             if (!success)
-                return (false, "Illegal file format.");
+                return (false, errorMsg);
 
             var subDir = await SubdirectoryGenerator.Generate(FormData, QueryData, request, extensionName);
             var folder = Path.Combine(Configure.RootDirectory, subDir);

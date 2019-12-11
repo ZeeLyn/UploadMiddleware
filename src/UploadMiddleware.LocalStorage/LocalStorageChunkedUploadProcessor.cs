@@ -52,9 +52,9 @@ namespace UploadMiddleware.LocalStorage
             //只验证第一个分片
             if (chunk == 0)
             {
-                var (success, fileSignature) = await FileValidator.Validate(localFileName, fileStream);
+                var (success, errorMsg, fileSignature) = await FileValidator.Validate(localFileName, fileStream);
                 if (!success)
-                    return (false, "Illegal file format.");
+                    return (false, errorMsg);
                 signature = fileSignature;
             }
 
