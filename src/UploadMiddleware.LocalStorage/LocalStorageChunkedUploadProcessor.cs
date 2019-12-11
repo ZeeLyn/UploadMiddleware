@@ -58,7 +58,7 @@ namespace UploadMiddleware.LocalStorage
                 signature = fileSignature;
             }
 
-            var chunksFolder = Path.Combine(Configure.RootDirectory, TempFolder, md5);
+            var chunksFolder = Path.Combine(string.IsNullOrWhiteSpace(Configure.ChunksRootDirectory) ? Configure.RootDirectory : Configure.ChunksRootDirectory, TempFolder, md5);
             if (!Directory.Exists(chunksFolder))
                 Directory.CreateDirectory(chunksFolder);
             var fileName = chunk + extensionName + ".$chunk";

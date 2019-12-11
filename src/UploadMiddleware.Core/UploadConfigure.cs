@@ -51,10 +51,10 @@ namespace UploadMiddleware.Core
         /// <summary>
         /// 授权过滤器
         /// </summary>
-        public Func<HttpContext, bool> AuthorizationFilter { get; set; }
+        //public Func<HttpContext, bool> AuthorizationFilter { get; set; }
 
         /// <summary>
-        /// 缓冲池大小（默认64KB）
+        /// 缓冲池大小（默认64KB）,推荐不要超过64KB，超过后会写磁盘
         /// </summary>
         public int BufferSize { get; set; } = 1024 * 64;
 

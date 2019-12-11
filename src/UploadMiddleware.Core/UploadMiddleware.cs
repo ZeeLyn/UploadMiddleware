@@ -47,11 +47,11 @@ namespace UploadMiddleware.Core
                 return;
             }
 
-            if (!(Configure.AuthorizationFilter?.Invoke(context) ?? true))
-            {
-                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                return;
-            }
+            //if (!(Configure.AuthorizationFilter?.Invoke(context) ?? true))
+            //{
+            //    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            //    return;
+            //}
 
             //await Next(context);
 

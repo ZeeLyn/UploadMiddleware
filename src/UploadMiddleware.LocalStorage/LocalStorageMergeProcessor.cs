@@ -45,7 +45,7 @@ namespace UploadMiddleware.LocalStorage
             }
 
             var chunks = int.Parse(chunksValue);
-            var chunksDir = Path.Combine(Configure.RootDirectory, "chunks", md5);
+            var chunksDir = Path.Combine(string.IsNullOrWhiteSpace(Configure.ChunksRootDirectory) ? Configure.RootDirectory : Configure.ChunksRootDirectory, "chunks", md5);
             if (!Directory.Exists(chunksDir))
             {
                 return (false, "", "请先上传文件.");

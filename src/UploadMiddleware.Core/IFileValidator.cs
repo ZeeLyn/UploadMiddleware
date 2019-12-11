@@ -33,8 +33,7 @@ namespace UploadMiddleware.Core
             var maxLen = signatures.Max(m => m.Length + offset);
             var headerBytes = new byte[maxLen];
             stream.Read(headerBytes, 0, maxLen);
-            var success = signatures.Any(signature =>
-                headerBytes.Skip(offset).Take(signature.Length).SequenceEqual(signature));
+            var success = signatures.Any(signature => headerBytes.Skip(offset).Take(signature.Length).SequenceEqual(signature));
             return await Task.FromResult((success, success ? "" : "Illegal file format.", headerBytes));
         }
     }
