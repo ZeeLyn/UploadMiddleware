@@ -35,7 +35,7 @@ namespace UploadMiddleware.Core
 
         public async Task InvokeAsync(HttpContext context)
         {
-            if (!context.Request.Path.Equals(Options.Route, StringComparison.CurrentCultureIgnoreCase))
+            if (!context.Request.Path.Equals(Options.Route, StringComparison.OrdinalIgnoreCase))
             {
                 await Next(context);
                 return;
@@ -125,7 +125,7 @@ namespace UploadMiddleware.Core
                             await context.Response.WriteResponseAsync(HttpStatusCode.UnsupportedMediaType, "ContentType must be multipart/form-data.");
                             return;
                         }
-                        if (!contentType.MediaType.Equals("multipart/form-data", StringComparison.CurrentCultureIgnoreCase))
+                        if (!contentType.MediaType.Equals("multipart/form-data", StringComparison.OrdinalIgnoreCase))
                         {
                             await context.Response.WriteResponseAsync(HttpStatusCode.UnsupportedMediaType, "ContentType must be multipart/form-data.");
                             return;

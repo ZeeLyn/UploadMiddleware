@@ -95,7 +95,7 @@ namespace UploadMiddleware.LocalStorage
             }
             return await Task.FromResult(new ResponseResult
             {
-                Content = (await GetFileMd5(url)).Equals(chunkMd5, StringComparison.CurrentCultureIgnoreCase) ? 1 : 0
+                Content = (await GetFileMd5(url)).Equals(chunkMd5, StringComparison.OrdinalIgnoreCase) ? 1 : 0
             });
         }
 
