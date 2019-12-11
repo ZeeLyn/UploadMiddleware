@@ -28,7 +28,7 @@ namespace Example
             {
                 options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
                 options.AllowFileExtension.Add(".mp4");
-                //options.AddUploadCompletedHandler<CustomUploadCompletedHandler>();
+                options.AddUploadCompletedHandler<CustomUploadCompletedHandler>();
             });
 
             //services.AddChunkedUploadLocalStorage(options =>

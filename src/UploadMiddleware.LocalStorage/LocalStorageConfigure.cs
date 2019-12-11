@@ -80,7 +80,7 @@ namespace UploadMiddleware.LocalStorage
         }
 
         /// <summary>
-        /// 添加合并完成结果组装Handler
+        /// 添加分片合并完成返回结果组装Handler
         /// </summary>
         /// <typeparam name="TMergeHandler"></typeparam>
         /// <returns></returns>

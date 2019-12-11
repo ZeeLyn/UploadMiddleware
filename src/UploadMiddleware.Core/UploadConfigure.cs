@@ -59,7 +59,7 @@ namespace UploadMiddleware.Core
         public int BufferSize { get; set; } = 1024 * 64;
 
         /// <summary>
-        /// 添加自定义(文件/分片)上传完成结果组装Handler
+        /// 添加自定义(文件/分片)上传完成返回结果组装Handler
         /// </summary>
         /// <typeparam name="TUploadCompletedHandler"></typeparam>
         /// <returns></returns>
@@ -89,7 +89,7 @@ namespace UploadMiddleware.Core
         }
 
         /// <summary>
-        /// 添加目录生成器
+        /// 添加子目录生成器
         /// </summary>
         /// <typeparam name="TSubdirectoryGenerator"></typeparam>
         /// <returns></returns>
