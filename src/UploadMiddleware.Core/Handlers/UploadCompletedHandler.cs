@@ -11,7 +11,7 @@ namespace UploadMiddleware.Core.Handlers
         {
             return await Task.FromResult(new ResponseResult
             {
-                Content = $"{{\"errorMsg\":\"OK\",\"data\":[{string.Join(",", fileData.Select(p => "\"" + p.Url + "\""))}]}}"
+                Content = fileData.Select(p => p.Url).ToArray()
             });
         }
     }

@@ -9,7 +9,9 @@ namespace UploadMiddleware.Core
 
         public string ContextType { get; set; } = "application/json";
 
-        public string Content { get; set; }
+        public object Content { get; set; }
+
+        public string ErrorMsg { get; set; } = "OK";
 
         public IHeaderDictionary Headers { get; set; }
     }

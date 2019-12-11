@@ -69,7 +69,7 @@
                             md5: val
                         },
                         success: function (res) {
-                            $.extend(file, { startChunk: res.chunks, md5: val });
+                            $.extend(file, { startChunk: res.data.chunks, md5: val });
                         }
                     });
                 });

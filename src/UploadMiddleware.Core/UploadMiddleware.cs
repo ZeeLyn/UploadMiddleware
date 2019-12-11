@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using UploadMiddleware.Core.Common;
 using UploadMiddleware.Core.Handlers;
 using UploadMiddleware.Core.Processors;
 
@@ -68,16 +69,7 @@ namespace UploadMiddleware.Core
                     }
 
                     var checkResult = await checker.Process();
-                    context.Response.StatusCode = (int)checkResult.StatusCode;
-                    context.Response.ContentType = checkResult.ContextType;
-                    if (checkResult.Headers != null && checkResult.Headers.Any())
-                    {
-                        foreach (var (key, value) in checkResult.Headers)
-                        {
-                            context.Response.Headers[key] = value;
-                        }
-                    }
-                    await context.Response.WriteAsync(checkResult.Content);
+                    await context.Response.WriteResponseAsync(checkResult.StatusCode, checkResult.ErrorMsg, checkResult.Content, checkResult.Headers);
                     break;
                 #endregion
 
@@ -89,16 +81,7 @@ namespace UploadMiddleware.Core
                         chunkChecker.FormData.Add(key, value);
                     }
                     var chunkCheckResult = await chunkChecker.Process();
-                    context.Response.StatusCode = (int)chunkCheckResult.StatusCode;
-                    context.Response.ContentType = chunkCheckResult.ContextType;
-                    if (chunkCheckResult.Headers != null && chunkCheckResult.Headers.Any())
-                    {
-                        foreach (var (key, value) in chunkCheckResult.Headers)
-                        {
-                            context.Response.Headers[key] = value;
-                        }
-                    }
-                    await context.Response.WriteAsync(chunkCheckResult.Content);
+                    await context.Response.WriteResponseAsync(chunkCheckResult.StatusCode, chunkCheckResult.ErrorMsg, chunkCheckResult.Content, chunkCheckResult.Headers);
                     break;
                 #endregion
 
@@ -116,25 +99,19 @@ namespace UploadMiddleware.Core
 
                     try
                     {
-                        var fileName = await merger.Process(context.Request);
-                        var mergeHandler = context.RequestServices.GetRequiredService<IMergeHandler>();
-                        var mergerResult = await mergeHandler.OnCompleted(merger.FormData, merger.QueryData, fileName, context.Request);
-                        context.Response.StatusCode = (int)mergerResult.StatusCode;
-                        context.Response.ContentType = mergerResult.ContextType;
-                        if (mergerResult.Headers != null && mergerResult.Headers.Any())
+                        var merge = await merger.Process(context.Request);
+                        if (!merge.Success)
                         {
-                            foreach (var (key, value) in mergerResult.Headers)
-                            {
-                                context.Response.Headers[key] = value;
-                            }
+                            await context.Response.WriteResponseAsync(HttpStatusCode.BadRequest, merge.ErrorMsg);
+                            return;
                         }
-                        await context.Response.WriteAsync(mergerResult.Content);
+                        var mergeHandler = context.RequestServices.GetRequiredService<IMergeHandler>();
+                        var mergerResult = await mergeHandler.OnCompleted(merger.FormData, merger.QueryData, merge.FileName, context.Request);
+                        await context.Response.WriteResponseAsync(mergerResult.StatusCode, mergerResult.ErrorMsg, mergerResult.Content, mergerResult.Headers);
                     }
                     catch (Exception e)
                     {
-                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                        context.Response.ContentType = "application/json";
-                        await context.Response.WriteAsync($"{{\"errorMsg\":\"{e.Message}\"}}");
+                        await context.Response.WriteResponseAsync(HttpStatusCode.BadRequest, e.Message);
                     }
                     break;
                 #endregion
@@ -145,14 +122,12 @@ namespace UploadMiddleware.Core
                     {
                         if (!MediaTypeHeaderValue.TryParse(context.Request.ContentType, out var contentType))
                         {
-                            context.Response.StatusCode = (int)HttpStatusCode.UnsupportedMediaType;
-                            await context.Response.WriteAsync("ContentType must be multipart/form-data.");
+                            await context.Response.WriteResponseAsync(HttpStatusCode.UnsupportedMediaType, "ContentType must be multipart/form-data.");
                             return;
                         }
                         if (!contentType.MediaType.Equals("multipart/form-data", StringComparison.CurrentCultureIgnoreCase))
                         {
-                            context.Response.StatusCode = (int)HttpStatusCode.UnsupportedMediaType;
-                            await context.Response.WriteAsync("ContentType must be multipart/form-data.");
+                            await context.Response.WriteResponseAsync(HttpStatusCode.UnsupportedMediaType, "ContentType must be multipart/form-data.");
                             return;
                         }
                         var processor = context.RequestServices.GetRequiredService<IUploadProcessor>();
@@ -174,7 +149,12 @@ namespace UploadMiddleware.Core
                                 {
                                     var fileSection = section.AsFileSection();
                                     var extensionName = Path.GetExtension(fileSection.FileName);
-                                    await processor.ProcessFile(fileSection.FileStream, extensionName, context.Request, fileSection.FileName, fileSection.Name);
+                                    var (success, errorMessage) = await processor.Process(fileSection.FileStream, extensionName, context.Request, fileSection.FileName, fileSection.Name);
+                                    if (!success)
+                                    {
+                                        await context.Response.WriteResponseAsync(HttpStatusCode.BadRequest, errorMessage);
+                                        return;
+                                    }
                                 }
                                 else
                                 {
@@ -188,30 +168,17 @@ namespace UploadMiddleware.Core
 
                         if (!processor.FileData.Any())
                         {
-                            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                            context.Response.ContentType = "application/json";
-                            await context.Response.WriteAsync("{\"errorMsg\":\"未发现上传文件\"}");
+                            await context.Response.WriteResponseAsync(HttpStatusCode.BadRequest, "未发现上传文件");
                             return;
                         }
 
                         var completeHandler = context.RequestServices.GetRequiredService<IUploadCompletedHandler>();
                         var result = await completeHandler.OnCompleted(processor.FormData, processor.FileData, processor.QueryData, context.Request);
-                        context.Response.StatusCode = (int)result.StatusCode;
-                        context.Response.ContentType = result.ContextType;
-                        if (result.Headers != null && result.Headers.Any())
-                        {
-                            foreach (var (key, value) in result.Headers)
-                            {
-                                context.Response.Headers[key] = value;
-                            }
-                        }
-                        await context.Response.WriteAsync(result.Content);
+                        await context.Response.WriteResponseAsync(result.StatusCode, result.ErrorMsg, result.Content, result.Headers);
                     }
                     catch (Exception e)
                     {
-                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                        context.Response.ContentType = "application/json";
-                        await context.Response.WriteAsync($"{{\"errorMsg\":\"{e.Message}\"}}");
+                        await context.Response.WriteResponseAsync(HttpStatusCode.BadRequest, e.Message);
                     }
                     break;
                     #endregion

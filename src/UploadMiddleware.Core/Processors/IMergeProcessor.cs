@@ -10,6 +10,6 @@ namespace UploadMiddleware.Core.Processors
 
         Dictionary<string, string> QueryData { get; }
 
-        Task<string> Process(HttpRequest request);
+        Task<(bool Success, string FileName, string ErrorMsg)> Process(HttpRequest request);
     }
 }

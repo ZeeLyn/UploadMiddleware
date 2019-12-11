@@ -28,20 +28,23 @@ namespace UploadMiddleware.LocalStorage
             FileValidator = fileValidator;
         }
 
-        public async Task<(bool Success, string ErrorMessage)> ProcessFile(Stream fileStream, string extensionName, HttpRequest request, string localFileName,
+        public async Task<(bool Success, string ErrorMessage)> Process(Stream fileStream, string extensionName, HttpRequest request, string localFileName,
             string sectionName)
         {
             if (!FormData.TryGetValue(Configure.FileMd5FormName, out var md5))
-                throw new ArgumentException($"未找到表单{Configure.FileMd5FormName}");
+                return (false, $"未找到表单{Configure.FileMd5FormName}.");
+
             if (string.IsNullOrWhiteSpace(md5))
-                throw new ArgumentNullException(Configure.FileMd5FormName);
+                return (false, "文件MD5值不能为空.");
+
             if (md5.Length != 32)
-                throw new ArgumentException("不合法的MD5值");
+                return (false, "不合法的MD5值.");
 
             if (!FormData.TryGetValue(Configure.ChunkFormName, out var chunkValue))
-                throw new ArgumentException($"未找到表单{Configure.ChunkFormName}");
+                return (false, $"未找到表单{Configure.ChunkFormName}.");
+
             if (string.IsNullOrWhiteSpace(chunkValue))
-                throw new ArgumentNullException(Configure.ChunkFormName);
+                return (false, "分片索引值不能为空");
 
             var chunk = int.Parse(chunkValue);
 

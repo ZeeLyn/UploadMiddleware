@@ -26,7 +26,7 @@ namespace UploadMiddleware.LocalStorage
                 return await Task.FromResult(new ResponseResult
                 {
                     StatusCode = System.Net.HttpStatusCode.BadRequest,
-                    Content = "{\"errorMsg:\":\"The md5 value of the file cannot be empty.\"}"
+                    ErrorMsg = "The md5 value of the file cannot be empty."
                 });
             }
             if (md5.Length != 32)
@@ -34,7 +34,7 @@ namespace UploadMiddleware.LocalStorage
                 return await Task.FromResult(new ResponseResult
                 {
                     StatusCode = System.Net.HttpStatusCode.BadRequest,
-                    Content = "{\"errorMsg:\":\"不合法的MD5值.\"}"
+                    ErrorMsg = "不合法的MD5值."
                 });
             }
 
@@ -43,7 +43,7 @@ namespace UploadMiddleware.LocalStorage
                 return await Task.FromResult(new ResponseResult
                 {
                     StatusCode = System.Net.HttpStatusCode.BadRequest,
-                    Content = "{\"errorMsg:\":\"The md5 value of the chunk cannot be empty.\"}"
+                    ErrorMsg = "The md5 value of the chunk cannot be empty."
                 });
             }
             if (chunkMd5.Length != 32)
@@ -51,7 +51,7 @@ namespace UploadMiddleware.LocalStorage
                 return await Task.FromResult(new ResponseResult
                 {
                     StatusCode = System.Net.HttpStatusCode.BadRequest,
-                    Content = "{\"errorMsg:\":\"不合法的MD5值.\"}"
+                    ErrorMsg = "不合法的MD5值"
                 });
             }
 
@@ -60,7 +60,7 @@ namespace UploadMiddleware.LocalStorage
                 return await Task.FromResult(new ResponseResult
                 {
                     StatusCode = System.Net.HttpStatusCode.BadRequest,
-                    Content = "{\"errorMsg:\":\"chunk 不能为空或参数错误.\"}"
+                    ErrorMsg = "不能为空或参数错误"
                 });
             }
 
@@ -71,7 +71,7 @@ namespace UploadMiddleware.LocalStorage
             {
                 return await Task.FromResult(new ResponseResult
                 {
-                    Content = "{\"errorMsg:\":\"OK\",\"status\":0}"
+                    Content = 0
                 });
             }
 
@@ -81,7 +81,7 @@ namespace UploadMiddleware.LocalStorage
             {
                 return await Task.FromResult(new ResponseResult
                 {
-                    Content = "{\"errorMsg:\":\"OK\",\"status\":0}"
+                    Content = 0
                 });
             }
             var extensionName = Path.GetExtension(files.First().Name.Replace(".$chunk", ""));
@@ -90,12 +90,12 @@ namespace UploadMiddleware.LocalStorage
             {
                 return await Task.FromResult(new ResponseResult
                 {
-                    Content = "{\"errorMsg:\":\"OK\",\"status\":0}"
+                    Content = 0
                 });
             }
             return await Task.FromResult(new ResponseResult
             {
-                Content = $"{{\"errorMsg:\":\"OK\",\"status\":{((await GetFileMd5(url)).Equals(chunkMd5, StringComparison.CurrentCultureIgnoreCase) ? 1 : 0)}}}"
+                Content = (await GetFileMd5(url)).Equals(chunkMd5, StringComparison.CurrentCultureIgnoreCase) ? 1 : 0
             });
         }
 

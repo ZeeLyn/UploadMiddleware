@@ -29,6 +29,7 @@ namespace UploadMiddleware.LocalStorage
             services.AddScoped(typeof(IMergeHandler), typeof(MergeHandler));
             services.AddScoped<ICheckChunksProcessor, LocalStorageCheckChunksProcessor>();
             services.AddScoped<ICheckChunkProcessor, LocalStorageCheckChunkProcessor>();
+            services.AddScoped<IUploadCompletedHandler, ChunkUploadCompletedHandler>();
             services.AddScoped<IMergeProcessor, LocalStorageMergeProcessor>();
             var config = new ChunkedUploadLocalStorageConfigure(services);
             options?.Invoke(config);

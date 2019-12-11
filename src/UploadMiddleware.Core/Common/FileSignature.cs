@@ -69,7 +69,9 @@ namespace UploadMiddleware.Core.Common
             };
 
         /// <summary>
-        /// 添加文件签名，可在此网站上查询：https://www.filesignatures.net/index.php?page=search
+        /// 添加文件签名，可在去这两个网站上查询：
+        /// 1：https://www.filesignatures.net/index.php?page=search
+        /// 2：https://en.wikipedia.org/wiki/List_of_file_signatures
         /// </summary>
         /// <param name="extensionName"></param>
         /// <param name="signature"></param>

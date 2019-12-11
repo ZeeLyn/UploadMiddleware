@@ -37,7 +37,7 @@ namespace UploadMiddleware.AliyunOSS
 
         public Dictionary<string, string> QueryData { get; } = new Dictionary<string, string>();
 
-        public async Task<(bool Success, string ErrorMessage)> ProcessFile(Stream fileStream, string extensionName, HttpRequest request, string localFileName, string sectionName)
+        public async Task<(bool Success, string ErrorMessage)> Process(Stream fileStream, string extensionName, HttpRequest request, string localFileName, string sectionName)
         {
             var (success, fileSignature) = await FileValidator.Validate(localFileName, fileStream);
             if (!success)
