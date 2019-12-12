@@ -75,9 +75,9 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 ---------|------|--------
 /upload|POST|multipart/form-data
 
-必须参数|类型|说明
+请求参数|类型|说明
 ---------|------|--------
-文件流|file|至少要上传一个文件
+file|stream|至少要上传一个文件
 md5|string|文件的MD5值，分片上传时必须
 chunk|int|当前上的分片索引，从0开始，分片上传时必须
 
@@ -88,13 +88,19 @@ chunk|int|当前上的分片索引，从0开始，分片上传时必须
 
 **检查已经上传的分片数量**
 
-路由 | 请求类型 | ContentType
----------|------|--------
-/upload?action=chunks|POST|application/x-www-form-urlencoded
+路由 | 请求类型 | ContentType|说明
+---------|------|--------|------
+/upload?action=chunks|POST|application/x-www-form-urlencoded|此接口只适用于单线程，分片按顺序上传
 
-必须参数|类型|说明
+请求参数|类型|说明
 ---------|------|--------
 md5|string|文件的MD5值
+
+
+返回值|类型|说明
+---------|------|--------
+errmsg|string|具体的错误信息
+chunks|int|已经上传的分片数量，默认会是已经上传的分片数量减一，因为可能最后一个分片不完整
 
 
 * * *
@@ -104,11 +110,16 @@ md5|string|文件的MD5值
 ---------|------|--------
 /upload?action=chunk|POST|application/x-www-form-urlencoded
 
-必须参数|类型|说明
+请求参数|类型|说明
 ---------|------|--------
 chunk_md5|string|分片的MD5值
 md5|string|文件的MD5值
 chunk|int|分片索引，从0开始
+
+返回值|类型|说明
+---------|------|--------
+errmsg|string|具体的错误信息
+data|int|0或1,1表示分片完整
 
 * * *
 
@@ -118,7 +129,7 @@ chunk|int|分片索引，从0开始
 ---------|------|--------
 /upload?action=merge|POST|application/x-www-form-urlencoded
 
-必须参数|类型|说明
+请求参数|类型|说明
 ---------|------|--------
 md5|string|文件的MD5值
 chunks|int|分片数量
@@ -126,7 +137,7 @@ chunks|int|分片数量
 * * *
 
 
-## 配置
+## 可选配置
 
 参数 | 类型 | 说明
 ---------|------|--------
@@ -156,3 +167,15 @@ AddCheckChunkProcessor|method|添加自定义分片完整性检测器
 AddMergeProcessor|method|添加自定义分片合并器
 AddMergeHandler|method|添加分片合并完成返回结果组装Handler
 
+
+
+## 关于分片上传
+* 分片上传会有两种情况，一种是前端多线程上传，一种是单线程上传。
+* 如果是多线程上传，上传分片的顺序可能是乱的，所以如果你需要支持断点续传的话，需要在上传前检查分片的完整性。
+* 单线程上传的话就简单一些，只要前端保证按顺序上传就可以，如果需要支持断点续传，只需要在上传前检查已经上传的分片数量，默认情况下返回的分片数量会是已经上传的分片数量减一，因为最后一个分片可能是不完整的，当然你也可以选择没个分片都验证完整性。
+* 前端推荐使用WebUploader，但是WebUploader分片上传有一个小问题：如果启用了分片上传，上传的文件大小又小于分片大小，WebUploader就不会分片，Form里也就不会带上分片索引和分片数量，所以这个需要自己处理一下。
+
+## 关于文件格式验证
+* 很多人上传文件只是单纯的验证文件的后缀名，这是不安全的。
+* UploadMiddleware默认的文件验证器，不止验证了后缀名，还会根据后缀名验证文件的[签名](https://en.wikipedia.org/wiki/File_signature),具体的文件签名可以去这两个地方查询：<https://www.filesignatures.net/index.php?page=search> ,  <https://en.wikipedia.org/wiki/List_of_file_signatures>
+* UploadMiddleware内置了常用(.jpg、.png、.gif、.bmp、.mp3、.mp4、.rar、.zip)的文件签名，可通过FileSignature类查询和添加

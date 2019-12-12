@@ -5,7 +5,7 @@ namespace UploadMiddleware.Core.Common
 {
     public class FileSignature
     {
-        private static readonly Dictionary<string, (int, List<byte[]>)> FilesSignature =
+        private static readonly Dictionary<string, (int Offset, List<byte[]> Signatures)> FilesSignature =
             new Dictionary<string, (int, List<byte[]>)>(StringComparer.OrdinalIgnoreCase)
             {
                 {
@@ -13,9 +13,15 @@ namespace UploadMiddleware.Core.Common
                     {
                         new byte[] {0xFF, 0xD8, 0xFF, 0xE0},
                         new byte[] {0xFF, 0xD8, 0xFF, 0xE1},
-                        new byte[] {0xFF, 0xD8, 0xFF, 0xE2},
-                        new byte[] {0xFF, 0xD8, 0xFF, 0xE3},
                         new byte[] {0xFF, 0xD8, 0xFF, 0xE8}
+                    })
+                },
+                {
+                    ".jpeg", (0, new List<byte[]>
+                    {
+                        new byte[] {0xFF, 0xD8, 0xFF, 0xE0},
+                        new byte[] {0xFF, 0xD8, 0xFF, 0xE2},
+                        new byte[] {0xFF, 0xD8, 0xFF, 0xE3}
                     })
                 },
                 {
@@ -75,7 +81,7 @@ namespace UploadMiddleware.Core.Common
         /// </summary>
         /// <param name="extensionName"></param>
         /// <param name="signature"></param>
-        /// <param name="offset">偏移量</param>
+        /// <param name="offset">偏移量（从偏移量的位置开始验证）</param>
         public static void AddSignature(string extensionName, List<byte[]> signature, int offset = 0)
         {
             if (offset < 0)
@@ -99,7 +105,7 @@ namespace UploadMiddleware.Core.Common
             return r;
         }
 
-        public static Dictionary<string, (int, List<byte[]>)> GetAllSignature()
+        public static Dictionary<string, (int Offset, List<byte[]> Signatures)> GetAllSignature()
         {
             return FilesSignature;
         }
