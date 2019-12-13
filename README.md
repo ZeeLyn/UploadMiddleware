@@ -77,7 +77,7 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 
 请求参数|类型|说明
 ---------|------|--------
-file|stream|至少要上传一个文件
+file|binary|至少要上传一个文件
 md5|string|文件的MD5值，分片上传时必须
 chunk|int|当前上的分片索引，从0开始，分片上传时必须
 
@@ -143,7 +143,7 @@ chunks|int|分片数量
 ---------|------|--------
 RootDirectory|string|文件保存的根目录
 MultipartBodyLengthLimit|long|Multipart Body的上限,Kestrel服务下才起作用,IIS下请在web.config里配置
-AllowFileExtension|HashSet|允许上传的文件格式(以"."开头)
+AllowFileExtension|HashSet|允许上传的文件格式(以"."开头),默认有：.jpg,.jpeg,.png,.gif,可以自行添加和删除
 BufferSize|int|缓冲池大小（默认64KB）,推荐不要超过64KB，超过后会写磁盘
 ChunksRootDirectory|string|存放分片的跟目录，不设置则默认使用RootDirectory
 ChunksFormName|string|传输分片数量的表单name（默认：chunks）
@@ -179,3 +179,7 @@ AddMergeHandler|method|添加分片合并完成返回结果组装Handler
 * 很多人上传文件只是单纯的验证文件的后缀名，这是不安全的。
 * UploadMiddleware默认的文件验证器，不止验证了后缀名，还会根据后缀名验证文件的[签名](https://en.wikipedia.org/wiki/File_signature),具体的文件签名可以去这两个地方查询：<https://www.filesignatures.net/index.php?page=search> ,  <https://en.wikipedia.org/wiki/List_of_file_signatures>
 * UploadMiddleware内置了常用(.jpg、.png、.gif、.bmp、.mp3、.mp4、.rar、.zip)的文件签名，可通过FileSignature类查询和添加
+
+## 关于权限控制
+* 权限过滤器本来就是中间件，UploadMiddleware也是中间件，所以UploadMiddleware内不能加权限过滤器。
+* 解决办法是在项目里写一个跟中间件路由一致的空api，api不需要有任何逻辑，也不会被调用，并加上AuthorizeAttribtue即可解决授权问题。
