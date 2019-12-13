@@ -181,5 +181,5 @@ AddMergeHandler|method|添加分片合并完成返回结果组装Handler
 * UploadMiddleware内置了常用(.jpg、.png、.gif、.bmp、.mp3、.mp4、.rar、.zip)的文件签名，可通过FileSignature类查询和添加
 
 ## 关于权限控制
-* 权限过滤器本来就是中间件，UploadMiddleware也是中间件，所以UploadMiddleware内不能加权限过滤器。
+* UploadMiddleware是中间件，中间件内不能加权限过滤器。
 * 解决办法是在项目里写一个跟中间件路由一致的空api，api不需要有任何逻辑，也不会被调用，并加上AuthorizeAttribtue即可解决授权问题。

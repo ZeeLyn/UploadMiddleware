@@ -71,7 +71,6 @@ namespace Example
             app.UseRouting();
 
             app.UseAuthorization();
-            //app.UsePathBase(Directory.GetCurrentDirectory());
             app.UseUpload("/upload");
             app.UseEndpoints(endpoints =>
             {

@@ -41,17 +41,13 @@ namespace UploadMiddleware.Core
         /// <summary>
         /// 文件保存的根目录
         /// </summary>
-        public string RootDirectory { get; set; } = Path.Combine(Directory.GetCurrentDirectory(), "upload");
+        public string RootDirectory { get; set; } = Path.Combine(AppContext.BaseDirectory, "upload");
 
         /// <summary>
         /// 允许上传的文件格式(以"."开头)
         /// </summary>
         public HashSet<string> AllowFileExtension { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".gif" };
 
-        /// <summary>
-        /// 授权过滤器
-        /// </summary>
-        //public Func<HttpContext, bool> AuthorizationFilter { get; set; }
 
         /// <summary>
         /// 缓冲池大小（默认64KB）,推荐不要超过64KB，超过后会写磁盘
