@@ -31,14 +31,14 @@ namespace Example
                 //options.AddUploadCompletedHandler<CustomUploadCompletedHandler>();
             });
 
-            //services.AddChunkedUploadLocalStorage(options =>
-            //{
-            //    options.AllowFileExtension.Add(".zip");
-            //    options.AllowFileExtension.Add(".mp4");
-            //    options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
-            //    options.DeleteChunksOnMerged = true;
-            //    options.ChunksRootDirectory = Path.Combine(Configuration.GetSection("SaveRootDirectory").Value, "·ÖÆ¬");
-            //});
+            services.AddChunkedUploadLocalStorage(options =>
+            {
+                options.AllowFileExtension.Add(".zip");
+                options.AllowFileExtension.Add(".mp4");
+                options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
+                options.DeleteChunksOnMerged = true;
+                options.ChunksRootDirectory = Path.Combine(Configuration.GetSection("SaveRootDirectory").Value);
+            });
 
             //services.AddUploadAliyunOSS(options =>
             //{

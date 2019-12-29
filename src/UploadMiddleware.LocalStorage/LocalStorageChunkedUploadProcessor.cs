@@ -40,13 +40,21 @@ namespace UploadMiddleware.LocalStorage
             if (md5.Length != 32)
                 return (false, "不合法的MD5值.");
 
-            if (!FormData.TryGetValue(Configure.ChunkFormName, out var chunkValue))
-                return (false, $"未找到表单{Configure.ChunkFormName}.");
+            var chunk = 0;
 
-            if (string.IsNullOrWhiteSpace(chunkValue))
-                return (false, "分片索引值不能为空");
+            if (FormData.TryGetValue(Configure.ChunkFormName, out var chunkValue))
+            {
+                if (string.IsNullOrWhiteSpace(chunkValue))
+                    return (false, "分片索引值不能为空");
+                chunk = int.Parse(chunkValue);
+            }
 
-            var chunk = int.Parse(chunkValue);
+            //if (!FormData.TryGetValue(Configure.ChunkFormName, out var chunkValue))
+            //    return (false, $"未找到表单{Configure.ChunkFormName}.");
+
+
+
+            //var chunk = int.Parse(chunkValue);
 
             byte[] signature = null;
             //只验证第一个分片
