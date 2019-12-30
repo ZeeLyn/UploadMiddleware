@@ -75,11 +75,11 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 ---------|------|--------
 /upload|POST|multipart/form-data
 
-请求参数|类型|说明
----------|------|--------
-file|binary|至少要上传一个文件
-md5|string|文件的MD5值，分片上传时必须
-chunk|int|当前上的分片索引，从0开始，分片上传时必须
+请求参数|类型|位置|说明
+---------|------|--------|----
+file|binary|body|至少要上传一个文件
+file-md5|string|header|文件的MD5值，分片上传时必须
+chunk|int|header|当前上的分片索引，从0开始，分片上传时必须
 
 
 * * *
@@ -92,9 +92,9 @@ chunk|int|当前上的分片索引，从0开始，分片上传时必须
 ---------|------|--------|------
 /upload?action=chunks|POST|application/x-www-form-urlencoded|此接口只适用于单线程，分片按顺序上传
 
-请求参数|类型|说明
----------|------|--------
-md5|string|文件的MD5值
+请求参数|类型|位置|说明
+---------|------|--------|---
+file-md5|string|header|文件的MD5值
 
 
 返回值|类型|说明
@@ -110,11 +110,11 @@ chunks|int|已经上传的分片数量，默认会是已经上传的分片数量
 ---------|------|--------
 /upload?action=chunk|POST|application/x-www-form-urlencoded
 
-请求参数|类型|说明
----------|------|--------
-chunk_md5|string|分片的MD5值
-md5|string|文件的MD5值
-chunk|int|分片索引，从0开始
+请求参数|类型|位置|说明
+---------|------|--------|----
+chunk-md5|string|header|分片的MD5值
+file-md5|string|header|文件的MD5值
+chunk|int|header|分片索引，从0开始
 
 返回值|类型|说明
 ---------|------|--------
@@ -129,10 +129,10 @@ data|int|0或1,1表示分片完整
 ---------|------|--------
 /upload?action=merge|POST|application/x-www-form-urlencoded
 
-请求参数|类型|说明
----------|------|--------
-md5|string|文件的MD5值
-chunks|int|分片数量
+请求参数|类型|位置|说明
+---------|------|--------|---
+file-md5|string|header|文件的MD5值
+chunks|int|header|分片数量
 
 * * *
 
@@ -146,10 +146,6 @@ MultipartBodyLengthLimit|long|Multipart Body的上限,Kestrel服务下才起作�
 AllowFileExtension|HashSet|允许上传的文件格式(以"."开头),默认有：.jpg,.jpeg,.png,.gif,可以自行添加和删除
 BufferSize|int|缓冲池大小（默认64KB）,推荐不要超过64KB，超过后会写磁盘
 ChunksRootDirectory|string|存放分片的跟目录，不设置则默认使用RootDirectory
-ChunksFormName|string|传输分片数量的表单name（默认：chunks）
-ChunkFormName|string| 传输分片索引的表单name,分片索引从0开始（默认：chunk）
-FileMd5FormName|string|传输文件的MD5值的表单name，注意是文件不是分片(默认：md5)
-ChunkMd5FormName|string|传输分片的MD5值的表单name（默认：chunk_md5）
 DeleteChunksOnMerged|bool|当分片合并完成时，是否删除分片，(默认：True)
 AccessId|string|OSS access key Id
 AccessKeySecret|string|OSS key secret
