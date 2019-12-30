@@ -59,7 +59,7 @@ namespace UploadMiddleware.Core
                 #region 检查已经上传的分片数量
                 case "chunks":
                     var checker = context.RequestServices.GetRequiredService<ICheckChunksProcessor>();
-                    var checkResult = await checker.Process(context.Request, context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers);
+                    var checkResult = await checker.Process(context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers);
                     await context.Response.WriteResponseAsync(checkResult.StatusCode, checkResult.ErrorMsg, checkResult.Content, checkResult.Headers);
                     break;
                 #endregion
@@ -67,7 +67,7 @@ namespace UploadMiddleware.Core
                 #region 检查分片完整性
                 case "chunk":
                     var chunkChecker = context.RequestServices.GetRequiredService<ICheckChunkProcessor>();
-                    var chunkCheckResult = await chunkChecker.Process(context.Request, context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers);
+                    var chunkCheckResult = await chunkChecker.Process(context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers);
                     await context.Response.WriteResponseAsync(chunkCheckResult.StatusCode, chunkCheckResult.ErrorMsg, chunkCheckResult.Content, chunkCheckResult.Headers);
                     break;
                 #endregion
@@ -77,14 +77,14 @@ namespace UploadMiddleware.Core
                     var merger = context.RequestServices.GetRequiredService<IMergeProcessor>();
                     try
                     {
-                        var merge = await merger.Process(context.Request, context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers);
+                        var merge = await merger.Process(context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers);
                         if (!merge.Success)
                         {
                             await context.Response.WriteResponseAsync(HttpStatusCode.BadRequest, merge.ErrorMsg);
                             return;
                         }
                         var mergeHandler = context.RequestServices.GetRequiredService<IMergeHandler>();
-                        var mergerResult = await mergeHandler.OnCompleted(context.Request, context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers, merge.FileName);
+                        var mergerResult = await mergeHandler.OnCompleted(context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers, merge.FileName);
                         await context.Response.WriteResponseAsync(mergerResult.StatusCode, mergerResult.ErrorMsg, mergerResult.Content, mergerResult.Headers);
                     }
                     catch (Exception e)
@@ -113,7 +113,7 @@ namespace UploadMiddleware.Core
                         var reader = new MultipartReader(boundary, context.Request.Body);
                         var section = await reader.ReadNextSectionAsync();
                         var formDic = new Dictionary<string, StringValues>();
-
+                        var fileResult = new List<UploadFileResult>();
                         while (section != null)
                         {
                             var header = section.GetContentDispositionHeader();
@@ -123,12 +123,14 @@ namespace UploadMiddleware.Core
                                 {
                                     var fileSection = section.AsFileSection();
                                     var extensionName = Path.GetExtension(fileSection.FileName);
-                                    var (success, errorMessage) = await processor.Process(context.Request, context.Request.Query, new FormCollection(formDic), context.Request.Headers, fileSection.FileStream, extensionName, fileSection.FileName, fileSection.Name);
+                                    var (success, uploadResult, errorMessage) = await processor.Process(context.Request.Query, new FormCollection(formDic), context.Request.Headers, fileSection.FileStream, extensionName, fileSection.FileName, fileSection.Name);
                                     if (!success)
                                     {
                                         await context.Response.WriteResponseAsync(HttpStatusCode.BadRequest, errorMessage);
                                         return;
                                     }
+
+                                    fileResult.Add(uploadResult);
                                 }
                                 else
                                 {
@@ -144,14 +146,14 @@ namespace UploadMiddleware.Core
                         }
 
 
-                        if (!processor.FileData.Any())
+                        if (!fileResult.Any())
                         {
                             await context.Response.WriteResponseAsync(HttpStatusCode.BadRequest, "未发现上传文件");
                             return;
                         }
 
                         var completeHandler = context.RequestServices.GetRequiredService<IUploadCompletedHandler>();
-                        var result = await completeHandler.OnCompleted(context.Request.Query, new FormCollection(formDic), context.Request.Headers, processor.FileData);
+                        var result = await completeHandler.OnCompleted(context.Request.Query, new FormCollection(formDic), context.Request.Headers, fileResult);
                         await context.Response.WriteResponseAsync(result.StatusCode, result.ErrorMsg, result.Content, result.Headers);
                     }
                     catch (Exception e)

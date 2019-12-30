@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
+using Microsoft.AspNetCore.Http;
 
 namespace UploadMiddleware.AliyunOSS
 {
@@ -14,12 +15,10 @@ namespace UploadMiddleware.AliyunOSS
         /// $SectionName
         /// </summary>
         /// <param name="meta"></param>
-        /// <param name="formData"></param>
-        /// <param name="queryData"></param>
         /// <param name="localFileName"></param>
         /// <param name="sectionName"></param>
         /// <returns></returns>
-        internal static string Resolve(this string meta, Dictionary<string, string> formData, Dictionary<string, string> queryData, string localFileName, string sectionName)
+        internal static string Resolve(this string meta, IQueryCollection queryData, IFormCollection formData, string localFileName, string sectionName)
         {
             if (string.IsNullOrWhiteSpace(meta))
                 return meta;

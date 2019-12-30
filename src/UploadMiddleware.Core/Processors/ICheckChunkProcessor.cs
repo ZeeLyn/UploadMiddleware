@@ -6,8 +6,6 @@ namespace UploadMiddleware.Core.Processors
 {
     public interface ICheckChunkProcessor
     {
-        //Dictionary<string, string> FormData { get; }
-
-        Task<ResponseResult> Process(HttpRequest request, IQueryCollection query, IFormCollection form, IHeaderDictionary headers);
+        Task<ResponseResult> Process(IQueryCollection query, IFormCollection form, IHeaderDictionary headers);
     }
 }

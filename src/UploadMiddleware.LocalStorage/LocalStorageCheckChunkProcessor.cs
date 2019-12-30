@@ -20,7 +20,7 @@ namespace UploadMiddleware.LocalStorage
             Configure = configure;
         }
         //public Dictionary<string, string> FormData { get; } = new Dictionary<string, string>();
-        public async Task<ResponseResult> Process(HttpRequest request, IQueryCollection query, IFormCollection form, IHeaderDictionary headers)
+        public async Task<ResponseResult> Process(IQueryCollection query, IFormCollection form, IHeaderDictionary headers)
         {
             if (!headers.TryGetValue(ConstConfigs.FileMd5HeaderKey, out var md5) || string.IsNullOrWhiteSpace(md5))
             {

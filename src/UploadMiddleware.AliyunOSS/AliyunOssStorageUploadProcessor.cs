@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Aliyun.OSS;
 using Microsoft.AspNetCore.Http;
@@ -31,23 +30,17 @@ namespace UploadMiddleware.AliyunOSS
             FileValidator = fileValidator;
         }
 
-        public Dictionary<string, string> FormData { get; } = new Dictionary<string, string>();
-
-        public List<UploadFileResult> FileData { get; } = new List<UploadFileResult>();
-
-        public Dictionary<string, string> QueryData { get; } = new Dictionary<string, string>();
-
-        public async Task<(bool Success, string ErrorMessage)> Process(HttpRequest request, IQueryCollection query, IFormCollection form, IHeaderDictionary headers, Stream fileStream, string extensionName, string localFileName, string sectionName)
+        public async Task<(bool Success, UploadFileResult Result, string ErrorMessage)> Process(IQueryCollection query, IFormCollection form, IHeaderDictionary headers, Stream fileStream, string extensionName, string localFileName, string sectionName)
         {
             var (success, errorMsg, fileSignature) = await FileValidator.Validate(localFileName, fileStream);
             if (!success)
-                return (false, errorMsg);
+                return (false, null, errorMsg);
 
-            var subDir = await SubdirectoryGenerator.Generate(request, request.Query, request.Form, request.Headers, extensionName);
+            var subDir = await SubdirectoryGenerator.Generate(query, form, headers, extensionName);
             var folder = Path.Combine(Configure.RootDirectory, subDir);
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
-            var fileName = await FileNameGenerator.Generate(request, request.Query, request.Form, request.Headers, extensionName) + extensionName;
+            var fileName = await FileNameGenerator.Generate(query, form, headers, extensionName) + extensionName;
             var url = Path.Combine(folder, fileName).Replace("\\", "/");
             await using var stream = new MemoryStream();
             if (fileSignature != null && fileSignature.Length > 0)
@@ -59,19 +52,18 @@ namespace UploadMiddleware.AliyunOSS
                 meta = new ObjectMetadata { ContentType = "application/octet-stream" };
             }
 
-            meta.ContentDisposition = meta.ContentDisposition.Resolve(FormData, QueryData, localFileName, sectionName);
+            meta.ContentDisposition = meta.ContentDisposition.Resolve(query, form, localFileName, sectionName);
             if (meta.UserMetadata != null)
             {
                 foreach (var (key, _) in meta.UserMetadata)
                 {
-                    meta.UserMetadata[key] = meta.UserMetadata[key].Resolve(FormData, QueryData, localFileName, sectionName);
+                    meta.UserMetadata[key] = meta.UserMetadata[key].Resolve(query, form, localFileName, sectionName);
                 }
             }
 
             Client.PutObject(Configure.BucketName, url, stream, meta);
 
-            FileData.Add(new UploadFileResult { Name = sectionName, Url = "/" + url });
-            return (true, "");
+            return (true, new UploadFileResult { Name = sectionName, Url = "/" + url }, "");
         }
     }
 }

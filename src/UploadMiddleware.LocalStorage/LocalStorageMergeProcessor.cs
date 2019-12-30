@@ -23,11 +23,8 @@ namespace UploadMiddleware.LocalStorage
             SubdirectoryGenerator = subdirectoryGenerator;
         }
 
-        //public Dictionary<string, string> FormData { get; } = new Dictionary<string, string>();
 
-        //public Dictionary<string, string> QueryData { get; } = new Dictionary<string, string>();
-
-        public async Task<(bool Success, string FileName, string ErrorMsg)> Process(HttpRequest request, IQueryCollection query, IFormCollection form, IHeaderDictionary headers)
+        public async Task<(bool Success, string FileName, string ErrorMsg)> Process(IQueryCollection query, IFormCollection form, IHeaderDictionary headers)
         {
             if (!headers.TryGetValue(ConstConfigs.FileMd5HeaderKey, out var md5) || string.IsNullOrWhiteSpace(md5))
             {
@@ -59,11 +56,11 @@ namespace UploadMiddleware.LocalStorage
             }
 
             var extensionName = Path.GetExtension(files.First().Name.Replace(".$chunk", ""));
-            var subDir = await SubdirectoryGenerator.Generate(request, query, form, headers, extensionName);
+            var subDir = await SubdirectoryGenerator.Generate(query, form, headers, extensionName);
             var folder = Path.Combine(Configure.RootDirectory, subDir);
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
-            var fileName = await FileNameGenerator.Generate(request, query, form, headers, extensionName) + extensionName;
+            var fileName = await FileNameGenerator.Generate(query, form, headers, extensionName) + extensionName;
             var url = Path.Combine(folder, fileName);
             await using var writeStream = new FileStream(url, FileMode.Append);
             {

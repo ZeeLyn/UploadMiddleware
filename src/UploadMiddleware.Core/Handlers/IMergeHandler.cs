@@ -5,6 +5,6 @@ namespace UploadMiddleware.Core.Handlers
 {
     public interface IMergeHandler
     {
-        Task<ResponseResult> OnCompleted(HttpRequest request, IQueryCollection query, IFormCollection form, IHeaderDictionary headers, string fileName);
+        Task<ResponseResult> OnCompleted(IQueryCollection query, IFormCollection form, IHeaderDictionary headers, string fileName);
     }
 }
