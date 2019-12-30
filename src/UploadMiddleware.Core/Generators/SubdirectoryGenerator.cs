@@ -7,7 +7,7 @@ namespace UploadMiddleware.Core.Generators
 {
     public class SubdirectoryGenerator : ISubdirectoryGenerator
     {
-        public async Task<string> Generate(Dictionary<string, string> formData, Dictionary<string, string> queryData, HttpRequest request, string extensionName)
+        public async Task<string> Generate(HttpRequest request, IQueryCollection query, IFormCollection form, IHeaderDictionary headers, string extensionName)
         {
             return await Task.FromResult(DateTime.Now.ToString("yyyyMMdd"));
         }

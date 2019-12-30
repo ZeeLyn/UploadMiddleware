@@ -6,7 +6,7 @@ namespace UploadMiddleware.Core.Handlers
 {
     public class MergeHandler : IMergeHandler
     {
-        public async Task<ResponseResult> OnCompleted(Dictionary<string, string> formData, Dictionary<string, string> queryData, string fileName, HttpRequest request)
+        public async Task<ResponseResult> OnCompleted(HttpRequest request, IQueryCollection query, IFormCollection form, IHeaderDictionary headers, string fileName)
         {
             return await Task.FromResult(new ResponseResult
             {

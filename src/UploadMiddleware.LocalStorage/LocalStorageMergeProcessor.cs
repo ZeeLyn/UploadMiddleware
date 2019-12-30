@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using UploadMiddleware.Core;
 using UploadMiddleware.Core.Generators;
 using UploadMiddleware.Core.Processors;
 
@@ -23,23 +23,23 @@ namespace UploadMiddleware.LocalStorage
             SubdirectoryGenerator = subdirectoryGenerator;
         }
 
-        public Dictionary<string, string> FormData { get; } = new Dictionary<string, string>();
+        //public Dictionary<string, string> FormData { get; } = new Dictionary<string, string>();
 
-        public Dictionary<string, string> QueryData { get; } = new Dictionary<string, string>();
+        //public Dictionary<string, string> QueryData { get; } = new Dictionary<string, string>();
 
-        public async Task<(bool Success, string FileName, string ErrorMsg)> Process(HttpRequest request)
+        public async Task<(bool Success, string FileName, string ErrorMsg)> Process(HttpRequest request, IQueryCollection query, IFormCollection form, IHeaderDictionary headers)
         {
-            if (!FormData.TryGetValue(Configure.FileMd5FormName, out var md5) || string.IsNullOrWhiteSpace(md5))
+            if (!headers.TryGetValue(ConstConfigs.FileMd5HeaderKey, out var md5) || string.IsNullOrWhiteSpace(md5))
             {
                 return (false, "", "The md5 value of the file cannot be empty.");
             }
 
-            if (md5.Length != 32)
+            if (md5.ToString().Length != 32)
             {
                 return (false, "", "不合法的MD5值.");
             }
 
-            if (!FormData.TryGetValue(Configure.ChunksFormName, out var chunksValue) || string.IsNullOrWhiteSpace(chunksValue))
+            if (!headers.TryGetValue(ConstConfigs.ChunksHeaderKey, out var chunksValue) || string.IsNullOrWhiteSpace(chunksValue))
             {
                 return (false, "", "The chunks value of the file cannot be empty.");
             }
@@ -59,11 +59,11 @@ namespace UploadMiddleware.LocalStorage
             }
 
             var extensionName = Path.GetExtension(files.First().Name.Replace(".$chunk", ""));
-            var subDir = await SubdirectoryGenerator.Generate(FormData, QueryData, request, extensionName);
+            var subDir = await SubdirectoryGenerator.Generate(request, query, form, headers, extensionName);
             var folder = Path.Combine(Configure.RootDirectory, subDir);
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
-            var fileName = await FileNameGenerator.Generate(FormData, QueryData, request, extensionName) + extensionName;
+            var fileName = await FileNameGenerator.Generate(request, query, form, headers, extensionName) + extensionName;
             var url = Path.Combine(folder, fileName);
             await using var writeStream = new FileStream(url, FileMode.Append);
             {

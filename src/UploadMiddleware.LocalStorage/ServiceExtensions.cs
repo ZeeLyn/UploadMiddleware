@@ -35,10 +35,6 @@ namespace UploadMiddleware.LocalStorage
             options?.Invoke(config);
             if (string.IsNullOrWhiteSpace(config.RootDirectory))
                 throw new ArgumentNullException(nameof(config.RootDirectory));
-            if (string.IsNullOrWhiteSpace(config.ChunkFormName))
-                throw new ArgumentNullException(config.ChunkFormName);
-            if (string.IsNullOrWhiteSpace(config.ChunksFormName))
-                throw new ArgumentNullException(config.ChunksFormName);
             services.AddSingleton<UploadConfigure>(config);
             return services.AddSingleton(config);
         }

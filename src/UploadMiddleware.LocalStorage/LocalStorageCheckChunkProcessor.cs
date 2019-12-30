@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using UploadMiddleware.Core;
 using UploadMiddleware.Core.Processors;
 
@@ -18,10 +19,10 @@ namespace UploadMiddleware.LocalStorage
         {
             Configure = configure;
         }
-        public Dictionary<string, string> FormData { get; } = new Dictionary<string, string>();
-        public async Task<ResponseResult> Process()
+        //public Dictionary<string, string> FormData { get; } = new Dictionary<string, string>();
+        public async Task<ResponseResult> Process(HttpRequest request, IQueryCollection query, IFormCollection form, IHeaderDictionary headers)
         {
-            if (!FormData.TryGetValue(Configure.FileMd5FormName, out var md5) || string.IsNullOrWhiteSpace(md5))
+            if (!headers.TryGetValue(ConstConfigs.FileMd5HeaderKey, out var md5) || string.IsNullOrWhiteSpace(md5))
             {
                 return await Task.FromResult(new ResponseResult
                 {
@@ -29,7 +30,7 @@ namespace UploadMiddleware.LocalStorage
                     ErrorMsg = "The md5 value of the file cannot be empty."
                 });
             }
-            if (md5.Length != 32)
+            if (md5.ToString().Length != 32)
             {
                 return await Task.FromResult(new ResponseResult
                 {
@@ -38,7 +39,7 @@ namespace UploadMiddleware.LocalStorage
                 });
             }
 
-            if (!FormData.TryGetValue(Configure.ChunkMd5FormName, out var chunkMd5) || string.IsNullOrWhiteSpace(chunkMd5))
+            if (!headers.TryGetValue(ConstConfigs.ChunkMd5HeaderKey, out var chunkMd5) || string.IsNullOrWhiteSpace(chunkMd5))
             {
                 return await Task.FromResult(new ResponseResult
                 {
@@ -46,7 +47,7 @@ namespace UploadMiddleware.LocalStorage
                     ErrorMsg = "The md5 value of the chunk cannot be empty."
                 });
             }
-            if (chunkMd5.Length != 32)
+            if (chunkMd5.ToString().Length != 32)
             {
                 return await Task.FromResult(new ResponseResult
                 {
@@ -55,12 +56,12 @@ namespace UploadMiddleware.LocalStorage
                 });
             }
 
-            if (!FormData.TryGetValue(Configure.ChunkFormName, out var chunkValue) || string.IsNullOrWhiteSpace(chunkValue) || !int.TryParse(chunkValue, out var chunk))
+            if (!headers.TryGetValue(ConstConfigs.ChunkHeaderKey, out var chunkValue) || string.IsNullOrWhiteSpace(chunkValue) || !int.TryParse(chunkValue, out var chunk))
             {
                 return await Task.FromResult(new ResponseResult
                 {
                     StatusCode = System.Net.HttpStatusCode.BadRequest,
-                    ErrorMsg = "不能为空或参数错误"
+                    ErrorMsg = "分片索引不能为空"
                 });
             }
 

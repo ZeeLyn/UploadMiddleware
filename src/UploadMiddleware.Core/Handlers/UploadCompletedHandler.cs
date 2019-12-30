@@ -7,7 +7,7 @@ namespace UploadMiddleware.Core.Handlers
 {
     public class UploadCompletedHandler : IUploadCompletedHandler
     {
-        public virtual async Task<ResponseResult> OnCompleted(Dictionary<string, string> formData, List<UploadFileResult> fileData, Dictionary<string, string> queryData, HttpRequest request)
+        public virtual async Task<ResponseResult> OnCompleted(IQueryCollection query, IFormCollection form, IHeaderDictionary headers, IReadOnlyList<UploadFileResult> fileData)
         {
             return await Task.FromResult(new ResponseResult
             {

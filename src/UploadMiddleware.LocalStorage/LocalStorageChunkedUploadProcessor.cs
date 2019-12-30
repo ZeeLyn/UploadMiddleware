@@ -10,11 +10,8 @@ namespace UploadMiddleware.LocalStorage
 {
     public class LocalStorageChunkedUploadProcessor : IUploadProcessor
     {
-        public Dictionary<string, string> FormData { get; } = new Dictionary<string, string>();
 
         public List<UploadFileResult> FileData { get; } = new List<UploadFileResult>();
-
-        public Dictionary<string, string> QueryData { get; } = new Dictionary<string, string>();
 
         private ChunkedUploadLocalStorageConfigure Configure { get; }
 
@@ -28,21 +25,21 @@ namespace UploadMiddleware.LocalStorage
             FileValidator = fileValidator;
         }
 
-        public async Task<(bool Success, string ErrorMessage)> Process(Stream fileStream, string extensionName, HttpRequest request, string localFileName,
+        public async Task<(bool Success, string ErrorMessage)> Process(HttpRequest request, IQueryCollection query, IFormCollection form, IHeaderDictionary headers, Stream fileStream, string extensionName, string localFileName,
             string sectionName)
         {
-            if (!FormData.TryGetValue(Configure.FileMd5FormName, out var md5))
-                return (false, $"未找到表单{Configure.FileMd5FormName}.");
+            if (!headers.TryGetValue(ConstConfigs.FileMd5HeaderKey, out var md5))
+                return (false, $"未找到Header key:{ConstConfigs.FileMd5HeaderKey}.");
 
             if (string.IsNullOrWhiteSpace(md5))
                 return (false, "文件MD5值不能为空.");
 
-            if (md5.Length != 32)
+            if (md5.ToString().Length != 32)
                 return (false, "不合法的MD5值.");
 
             var chunk = 0;
 
-            if (FormData.TryGetValue(Configure.ChunkFormName, out var chunkValue))
+            if (headers.TryGetValue(ConstConfigs.ChunkHeaderKey, out var chunkValue))
             {
                 if (string.IsNullOrWhiteSpace(chunkValue))
                     return (false, "分片索引值不能为空");

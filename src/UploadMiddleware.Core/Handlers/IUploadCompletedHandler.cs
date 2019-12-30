@@ -6,6 +6,6 @@ namespace UploadMiddleware.Core.Handlers
 {
     public interface IUploadCompletedHandler
     {
-        Task<ResponseResult> OnCompleted(Dictionary<string, string> formData, List<UploadFileResult> fileData, Dictionary<string, string> queryData, HttpRequest request);
+        Task<ResponseResult> OnCompleted(IQueryCollection query, IFormCollection form, IHeaderDictionary headers, IReadOnlyList<UploadFileResult> fileData);
     }
 }

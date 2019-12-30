@@ -46,7 +46,7 @@
                 swf: '/lib/webuploader/dist/Uploader.swf',
                 chunked: true,
                 chunkSize: 1024 * 1024,
-                threads: 10,
+                threads: 1,
                 // 文件接收服务端。
                 server: '/upload',
                 compress: false,
@@ -65,8 +65,8 @@
                     $.ajax({
                         type: "post",
                         url: "/upload?action=chunks",
-                        data: {
-                            md5: val
+                        headers: {
+                            "file-md5": val
                         },
                         success: function (res) {
                             $.extend(file, { startChunk: res.data.chunks, md5: val });
@@ -77,22 +77,20 @@
             });
 
             uploader.on("uploadBeforeSend", function (block, data, headers) {
-                //console.log(block);
-                //uploader.md5File(block.blob).then(function (val) {
-                //    console.log(block.chunk + ":" + val);
-                //});
-                data.md5 = block.file.md5;
+                headers["file-md5"] = block.file.md5;
+                headers.chunk = block.chunk;
+                headers.chunks = block.chunks;
                 $.extend(block.file, { chunks: block.chunks });
             });
 
             uploader.on("uploadSuccess", function (file, res) {
-                //console.log(file);
+                console.log(file);
                 $.ajax({
                     type: "post",
                     url: "/upload?action=merge",
-                    data: {
-                        md5: file.md5,
-                        chunks: file.chunks
+                    headers: {
+                        "file-md5": file.md5,
+                        "chunks": file.chunks
                     },
                     success: function (res) {
                         console.log(res);

@@ -37,17 +37,17 @@ namespace UploadMiddleware.AliyunOSS
 
         public Dictionary<string, string> QueryData { get; } = new Dictionary<string, string>();
 
-        public async Task<(bool Success, string ErrorMessage)> Process(Stream fileStream, string extensionName, HttpRequest request, string localFileName, string sectionName)
+        public async Task<(bool Success, string ErrorMessage)> Process(HttpRequest request, IQueryCollection query, IFormCollection form, IHeaderDictionary headers, Stream fileStream, string extensionName, string localFileName, string sectionName)
         {
             var (success, errorMsg, fileSignature) = await FileValidator.Validate(localFileName, fileStream);
             if (!success)
                 return (false, errorMsg);
 
-            var subDir = await SubdirectoryGenerator.Generate(FormData, QueryData, request, extensionName);
+            var subDir = await SubdirectoryGenerator.Generate(request, request.Query, request.Form, request.Headers, extensionName);
             var folder = Path.Combine(Configure.RootDirectory, subDir);
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
-            var fileName = await FileNameGenerator.Generate(FormData, QueryData, request, extensionName) + extensionName;
+            var fileName = await FileNameGenerator.Generate(request, request.Query, request.Form, request.Headers, extensionName) + extensionName;
             var url = Path.Combine(folder, fileName).Replace("\\", "/");
             await using var stream = new MemoryStream();
             if (fileSignature != null && fileSignature.Length > 0)

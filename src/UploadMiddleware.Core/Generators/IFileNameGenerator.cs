@@ -6,6 +6,6 @@ namespace UploadMiddleware.Core.Generators
 {
     public interface IFileNameGenerator
     {
-        Task<string> Generate(Dictionary<string, string> formData, Dictionary<string, string> queryData, HttpRequest request, string extensionName);
+        Task<string> Generate(HttpRequest request, IQueryCollection query, IFormCollection form, IHeaderDictionary headers, string extensionName);
     }
 }
