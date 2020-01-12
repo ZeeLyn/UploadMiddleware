@@ -72,7 +72,7 @@ namespace UploadMiddleware.LocalStorage
             {
                 return await Task.FromResult(new ResponseResult
                 {
-                    Content = 0
+                    Content = new { exist = false }
                 });
             }
 
@@ -82,7 +82,7 @@ namespace UploadMiddleware.LocalStorage
             {
                 return await Task.FromResult(new ResponseResult
                 {
-                    Content = 0
+                    Content = new { exist = false }
                 });
             }
             var extensionName = Path.GetExtension(files.First().Name.Replace(".$chunk", ""));
@@ -91,12 +91,12 @@ namespace UploadMiddleware.LocalStorage
             {
                 return await Task.FromResult(new ResponseResult
                 {
-                    Content = 0
+                    Content = new { exist = false }
                 });
             }
             return await Task.FromResult(new ResponseResult
             {
-                Content = (await GetFileMd5(url)).Equals(chunkMd5, StringComparison.OrdinalIgnoreCase) ? 1 : 0
+                Content = new { exist = (await GetFileMd5(url)).Equals(chunkMd5, StringComparison.OrdinalIgnoreCase) }
             });
         }
 
