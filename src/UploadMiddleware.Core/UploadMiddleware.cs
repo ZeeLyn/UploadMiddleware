@@ -58,7 +58,12 @@ namespace UploadMiddleware.Core
             {
                 #region 检查已经上传的分片数量
                 case "chunks":
-                    var checker = context.RequestServices.GetRequiredService<ICheckChunksProcessor>();
+                    var checker = context.RequestServices.GetService<ICheckChunksProcessor>();
+                    if (checker == null)
+                    {
+                        await context.Response.WriteResponseAsync(HttpStatusCode.NotFound, "Not Found!");
+                        break;
+                    }
                     var checkResult = await checker.Process(context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers);
                     await context.Response.WriteResponseAsync(checkResult.StatusCode, checkResult.ErrorMsg, checkResult.Content, checkResult.Headers);
                     break;
@@ -66,7 +71,12 @@ namespace UploadMiddleware.Core
 
                 #region 检查分片完整性
                 case "chunk":
-                    var chunkChecker = context.RequestServices.GetRequiredService<ICheckChunkProcessor>();
+                    var chunkChecker = context.RequestServices.GetService<ICheckChunkProcessor>();
+                    if (chunkChecker == null)
+                    {
+                        await context.Response.WriteResponseAsync(HttpStatusCode.NotFound, "Not Found!");
+                        break;
+                    }
                     var chunkCheckResult = await chunkChecker.Process(context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers);
                     await context.Response.WriteResponseAsync(chunkCheckResult.StatusCode, chunkCheckResult.ErrorMsg, chunkCheckResult.Content, chunkCheckResult.Headers);
                     break;
@@ -74,7 +84,12 @@ namespace UploadMiddleware.Core
 
                 #region 合并分片
                 case "merge":
-                    var merger = context.RequestServices.GetRequiredService<IMergeProcessor>();
+                    var merger = context.RequestServices.GetService<IMergeProcessor>();
+                    if (merger == null)
+                    {
+                        await context.Response.WriteResponseAsync(HttpStatusCode.NotFound, "Not Found!");
+                        break;
+                    }
                     try
                     {
                         var merge = await merger.Process(context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers);
