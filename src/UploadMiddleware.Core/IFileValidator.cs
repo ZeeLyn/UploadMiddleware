@@ -28,12 +28,12 @@ namespace UploadMiddleware.Core
             var extensionName = Path.GetExtension(fileName);
             if (!Configure.AllowFileExtension.Contains(extensionName))
                 return (false, "Illegal file format.", null);
-            if (!FileSignature.GetSignature(extensionName, out var signatures, out var offset))
+            if (!FileSignature.GetSignature(extensionName, out var signatures))
                 return (false, $"未找到{extensionName}文件的签名，通过FileSignature.AddSignature()方法添加签名。", null);
-            var maxLen = signatures.Max(m => m.Length + offset);
+            var maxLen = signatures.Max(m => m.Signature.Length + m.Offset);
             var headerBytes = new byte[maxLen];
             stream.Read(headerBytes, 0, maxLen);
-            var success = signatures.Any(signature => headerBytes.Skip(offset).Take(signature.Length).SequenceEqual(signature));
+            var success = signatures.Any(signature => headerBytes.Skip(signature.Offset).Take(signature.Signature.Length).SequenceEqual(signature.Signature));
             return await Task.FromResult((success, success ? "" : "Illegal file format.", headerBytes));
         }
     }

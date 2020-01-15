@@ -5,72 +5,94 @@ namespace UploadMiddleware.Core.Common
 {
     public class FileSignature
     {
-        private static readonly Dictionary<string, (int Offset, List<byte[]> Signatures)> FilesSignature =
-            new Dictionary<string, (int, List<byte[]>)>(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, List<(int Offset, byte[] Signatures)>> FilesSignature =
+            new Dictionary<string, List<(int, byte[])>>(StringComparer.OrdinalIgnoreCase)
             {
                 {
-                    ".jpg", (0, new List<byte[]>
+                    ".jpg", new List<(int, byte[])>
                     {
-                        new byte[] {0xFF, 0xD8, 0xFF, 0xE0},
-                        new byte[] {0xFF, 0xD8, 0xFF, 0xE1},
-                        new byte[] {0xFF, 0xD8, 0xFF, 0xE8}
-                    })
+                        (0, new byte[] {0xFF, 0xD8, 0xFF, 0xE0}),
+                        (0, new byte[] {0xFF, 0xD8, 0xFF, 0xE1}),
+                        (0, new byte[] {0xFF, 0xD8, 0xFF, 0xE8})
+                    }
                 },
                 {
-                    ".jpeg", (0, new List<byte[]>
+                    ".jpeg", new List<(int, byte[])>
                     {
-                        new byte[] {0xFF, 0xD8, 0xFF, 0xE0},
-                        new byte[] {0xFF, 0xD8, 0xFF, 0xE2},
-                        new byte[] {0xFF, 0xD8, 0xFF, 0xE3}
-                    })
+                        (0, new byte[] {0xFF, 0xD8, 0xFF, 0xE0}),
+                        (0, new byte[] {0xFF, 0xD8, 0xFF, 0xE2}),
+                        (0, new byte[] {0xFF, 0xD8, 0xFF, 0xE3})
+                    }
                 },
                 {
-                    ".png", (0, new List<byte[]>
+                    ".png", new List<(int, byte[])>
                     {
-                        new byte[] {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}
-                    })
+                        (0, new byte[] {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A})
+                    }
                 },
                 {
-                    ".gif", (0, new List<byte[]>
+                    ".gif", new List<(int, byte[])>
                     {
-                        new byte[] {0x47, 0x49, 0x46, 0x38}
-                    })
+                        (0, new byte[] {0x47, 0x49, 0x46, 0x38})
+                    }
                 },
                 {
-                    ".bmp", (0, new List<byte[]>
+                    ".bmp", new List<(int, byte[])>
                     {
-                        new byte[] {0x42, 0x4D}
-                    })
+                        (0, new byte[] {0x42, 0x4D})
+                    }
                 },
                 {
-                    ".mp3", (0, new List<byte[]>
+                    ".mp3", new List<(int, byte[])>
                     {
-                        new byte[] {0x49, 0x44, 0x33}
-                    })
+                        (0, new byte[] {0x49, 0x44, 0x33})
+                    }
                 },
                 {
-                    ".mp4", (4, new List<byte[]>
+                    ".mp4", new List<(int, byte[])>
                     {
-                        new byte[] { 0x66, 0x74, 0x79, 0x70, 0x6D, 0x70, 0x34, 0x32}
-                    })
+                        (4, new byte[] {0x66, 0x74, 0x79, 0x70, 0x6D, 0x70, 0x34, 0x32})
+                    }
                 },
                 {
-                    ".rar", (0, new List<byte[]>
+                    ".rar", new List<(int, byte[])>
                     {
-                        new byte[] {0x52, 0x61, 0x72, 0x21, 0x1A, 0x07, 0x00}
-                    })
+                        (0, new byte[] {0x52, 0x61, 0x72, 0x21, 0x1A, 0x07, 0x00})
+                    }
                 },
                 {
-                    ".zip", (0, new List<byte[]>
+                    ".zip", new List<(int, byte[])>
                     {
-                        new byte[] {0x50, 0x4B, 0x03, 0x04},
-                        new byte[] {0x50, 0x4B, 0x4C, 0x49, 0x54, 0x45},
-                        new byte[] {0x50, 0x4B, 0x53, 0x70, 0x58},
-                        new byte[] {0x50, 0x4B, 0x05, 0x06},
-                        new byte[] {0x50, 0x4B, 0x07, 0x08},
-                        new byte[] {0x57, 0x69, 0x6E, 0x5A, 0x69, 0x70},
-                        new byte[] {0x50, 0x4B, 0x03, 0x04, 0x14, 0x00, 0x01, 0x00}
-                    })
+                        (0, new byte[] {0x50, 0x4B, 0x03, 0x04}),
+                        (0, new byte[] {0x50, 0x4B, 0x4C, 0x49, 0x54, 0x45}),
+                        (0, new byte[] {0x50, 0x4B, 0x53, 0x70, 0x58}),
+                        (0, new byte[] {0x50, 0x4B, 0x05, 0x06}),
+                        (0, new byte[] {0x50, 0x4B, 0x07, 0x08}),
+                        (0, new byte[] {0x57, 0x69, 0x6E, 0x5A, 0x69, 0x70}),
+                        (0, new byte[] {0x50, 0x4B, 0x03, 0x04, 0x14, 0x00, 0x01, 0x00})
+                    }
+                },
+                {
+                    ".pdf", new List<(int, byte[])>
+                    {
+                        (0, new byte[] {0x25, 0x50, 0x44, 0x46})
+                    }
+                },
+                {
+                    ".doc", new List<(int, byte[])>
+                    {
+                        (0, new byte[] {0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1}),
+                        (0, new byte[] {0x0D, 0x44, 0x4F, 0x43}),
+                        (0, new byte[] {0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0x00}),
+                        (0, new byte[] {0xDB, 0xA5, 0x2D, 0x00})
+                    }
+                },
+                {
+                    ".docx", new List<(int, byte[])>
+                    {
+                        (0, new byte[] {0x50, 0x4B, 0x03, 0x04}),
+                        (0, new byte[] {0x50, 0x4B, 0x03, 0x04, 0x14, 0x00, 0x06, 0x00})
+                    }
                 }
             };
 
@@ -81,31 +103,19 @@ namespace UploadMiddleware.Core.Common
         /// </summary>
         /// <param name="extensionName"></param>
         /// <param name="signature"></param>
-        /// <param name="offset">偏移量（从偏移量的位置开始验证）</param>
-        public static void AddSignature(string extensionName, List<byte[]> signature, int offset = 0)
+        public static void AddSignature(string extensionName, List<(int offset, byte[] signature)> signature)
         {
-            if (offset < 0)
-                throw new ArgumentException("offset不能小于0");
-            FilesSignature.Add(extensionName, (offset, signature));
+            //if (signature < 0)
+            //    throw new ArgumentException("offset不能小于0");
+            FilesSignature.Add(extensionName, signature);
         }
 
-        public static bool GetSignature(string extensionName, out List<byte[]> signature, out int offset)
+        public static bool GetSignature(string extensionName, out List<(int Offset, byte[] Signature)> signature)
         {
-            var r = FilesSignature.TryGetValue(extensionName, out var value);
-            if (r)
-            {
-                signature = value.Item2;
-                offset = value.Item1;
-            }
-            else
-            {
-                signature = null;
-                offset = 0;
-            }
-            return r;
+            return FilesSignature.TryGetValue(extensionName, out signature);
         }
 
-        public static Dictionary<string, (int Offset, List<byte[]> Signatures)> GetAllSignature()
+        public static Dictionary<string, List<(int Offset, byte[] Signatures)>> GetAllSignature()
         {
             return FilesSignature;
         }

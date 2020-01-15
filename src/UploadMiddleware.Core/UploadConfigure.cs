@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using UploadMiddleware.Core.Generators;
@@ -48,6 +47,20 @@ namespace UploadMiddleware.Core
         /// </summary>
         public HashSet<string> AllowFileExtension { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".gif" };
 
+        /// <summary>
+        /// 添加允许上传的文件格式(以"."开头)，默认支持.jpg,.jpeg,.png,.gif
+        /// </summary>
+        /// <param name="ext"></param>
+        public void AddAllowFileExtension(params string[] ext)
+        {
+            foreach (var f in ext)
+            {
+                var extString = f.StartsWith(".") ? f : "." + f;
+                if (AllowFileExtension.Contains(extString))
+                    continue;
+                AllowFileExtension.Add(extString);
+            }
+        }
 
         /// <summary>
         /// 缓冲池大小（默认64KB）,推荐不要超过64KB，超过后会写磁盘

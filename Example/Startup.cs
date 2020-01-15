@@ -27,14 +27,13 @@ namespace Example
             services.AddUploadLocalStorage(options =>
             {
                 options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
-                options.AllowFileExtension.Add(".mp4");
+                options.AddAllowFileExtension(".mp4");
                 //options.AddUploadCompletedHandler<CustomUploadCompletedHandler>();
             });
 
             services.AddChunkedUploadLocalStorage(options =>
             {
-                options.AllowFileExtension.Add(".zip");
-                options.AllowFileExtension.Add(".mp4");
+                options.AddAllowFileExtension(".zip", ".mp4");
                 options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
                 options.DeleteChunksOnMerged = true;
                 options.ChunksRootDirectory = Path.Combine(Configuration.GetSection("SaveRootDirectory").Value);
