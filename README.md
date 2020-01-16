@@ -174,7 +174,7 @@ AddMergeHandler|method|添加分片合并完成返回结果组装Handler
 ## 关于文件格式验证
 * 很多人上传文件只是单纯的验证文件的后缀名，这是不安全的。
 * UploadMiddleware默认的文件验证器，不止验证了后缀名，还会根据后缀名验证文件的[签名](https://en.wikipedia.org/wiki/File_signature),具体的文件签名可以去这两个地方查询：<https://www.filesignatures.net/index.php?page=search> ,  <https://en.wikipedia.org/wiki/List_of_file_signatures>
-* UploadMiddleware内置了常用(.jpg、.png、.gif、.bmp、.mp3、.mp4、.rar、.zip)的文件签名，可通过FileSignature类查询和添加
+* UploadMiddleware内置了常用(.jpg、.png、.gif、.bmp、.mp3、.mp4、.rar、.zip、.doc、.docx、.xls、.xlsx、.ppt、.pptx、.pdf)的文件签名，可通过FileSignature类查询和添加
 
 ## 关于权限控制
 * UploadMiddleware是中间件，中间件内不能加权限过滤器。
