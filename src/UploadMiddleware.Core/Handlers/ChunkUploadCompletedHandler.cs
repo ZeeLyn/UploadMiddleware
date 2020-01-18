@@ -10,7 +10,7 @@ namespace UploadMiddleware.Core.Handlers
         {
             return await Task.FromResult(new ResponseResult
             {
-                Content = null
+
             });
         }
     }

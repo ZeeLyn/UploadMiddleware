@@ -62,6 +62,7 @@
 
                 //console.log(file);
                 uploader.md5File(file).then(function (val) {
+                    file.md5 = val;
                     $.ajax({
                         type: "post",
                         url: "/upload?action=chunks",
@@ -77,6 +78,7 @@
             });
 
             uploader.on("uploadBeforeSend", function (block, data, headers) {
+                console.log(block.file);
                 headers["file-md5"] = block.file.md5;
                 headers.chunk = block.chunk;
                 headers.chunks = block.chunks;
@@ -84,7 +86,7 @@
             });
 
             uploader.on("uploadSuccess", function (file, res) {
-                console.log(file);
+                //console.log(file);
                 $.ajax({
                     type: "post",
                     url: "/upload?action=merge",

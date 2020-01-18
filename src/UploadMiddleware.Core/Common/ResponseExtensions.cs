@@ -19,7 +19,23 @@ namespace UploadMiddleware.Core.Common
                     response.Headers[key] = value;
                 }
             }
-            await response.WriteAsync(data == null ? JsonSerializer.Serialize(new { errmsg = errorMsg }) : JsonSerializer.Serialize(new { errmsg = errorMsg, data }));
+
+            string result;
+            if (statusCode == HttpStatusCode.OK)
+            {
+                result = data == null
+                    ? JsonSerializer.Serialize(new { errmsg = "OK" })
+                    : JsonSerializer.Serialize(data, new JsonSerializerOptions { IgnoreNullValues = true });
+            }
+            else
+            {
+                result = data == null
+                    ? JsonSerializer.Serialize(new { errmsg = errorMsg })
+                    : JsonSerializer.Serialize(new { errmsg = errorMsg, data },
+                        new JsonSerializerOptions { IgnoreNullValues = true });
+            }
+
+            await response.WriteAsync(result);
         }
     }
 }
