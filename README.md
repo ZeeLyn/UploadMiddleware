@@ -1,5 +1,5 @@
 # UploadMiddleware
-文件上传中间件，支持分片断点上传
+文件上传中间件，支持分片断点上传，目前还在开发迭代中，可能有些地方会做调整，目前不建议使用到生成环境
 
 # Packages & Status
 Packages | NuGet
