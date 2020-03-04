@@ -64,7 +64,7 @@ namespace UploadMiddleware.Core
                         await context.Response.WriteResponseAsync(HttpStatusCode.NotFound, "Not Found!");
                         break;
                     }
-                    var checkResult = await checker.Process(context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers);
+                    var checkResult = await checker.Process(context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers, context.Request);
                     await context.Response.WriteResponseAsync(checkResult.StatusCode, checkResult.ErrorMsg, checkResult.Content, checkResult.Headers);
                     break;
                 #endregion
@@ -77,7 +77,7 @@ namespace UploadMiddleware.Core
                         await context.Response.WriteResponseAsync(HttpStatusCode.NotFound, "Not Found!");
                         break;
                     }
-                    var chunkCheckResult = await chunkChecker.Process(context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers);
+                    var chunkCheckResult = await chunkChecker.Process(context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers, context.Request);
                     await context.Response.WriteResponseAsync(chunkCheckResult.StatusCode, chunkCheckResult.ErrorMsg, chunkCheckResult.Content, chunkCheckResult.Headers);
                     break;
                 #endregion
@@ -92,7 +92,7 @@ namespace UploadMiddleware.Core
                     }
                     try
                     {
-                        var merge = await merger.Process(context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers);
+                        var merge = await merger.Process(context.Request.Query, context.Request.HasFormContentType ? context.Request.Form : null, context.Request.Headers, context.Request);
                         if (!merge.Success)
                         {
                             await context.Response.WriteResponseAsync(HttpStatusCode.BadRequest, merge.ErrorMsg);
@@ -138,7 +138,7 @@ namespace UploadMiddleware.Core
                                 {
                                     var fileSection = section.AsFileSection();
                                     var extensionName = Path.GetExtension(fileSection.FileName);
-                                    var (success, uploadResult, errorMessage) = await processor.Process(context.Request.Query, new FormCollection(formDic), context.Request.Headers, fileSection.FileStream, extensionName, fileSection.FileName, fileSection.Name);
+                                    var (success, uploadResult, errorMessage) = await processor.Process(context.Request.Query, new FormCollection(formDic), context.Request.Headers, fileSection.FileStream, extensionName, fileSection.FileName, fileSection.Name, context.Request);
                                     if (!success)
                                     {
                                         await context.Response.WriteResponseAsync(HttpStatusCode.BadRequest, errorMessage);

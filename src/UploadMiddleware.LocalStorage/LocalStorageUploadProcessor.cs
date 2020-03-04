@@ -25,16 +25,16 @@ namespace UploadMiddleware.LocalStorage
             FileValidator = fileValidator;
         }
 
-        public async Task<(bool Success, UploadFileResult Result, string ErrorMessage)> Process(IQueryCollection query, IFormCollection form, IHeaderDictionary headers, Stream fileStream, string extensionName, string localFileName, string sectionName)
+        public async Task<(bool Success, UploadFileResult Result, string ErrorMessage)> Process(IQueryCollection query, IFormCollection form, IHeaderDictionary headers, Stream fileStream, string extensionName, string localFileName, string sectionName, HttpRequest request)
         {
             var (success, errorMsg, fileSignature) = await FileValidator.Validate(localFileName, fileStream);
             if (!success)
                 return (false, null, errorMsg);
-            var subDir = await SubdirectoryGenerator.Generate(query, form, headers, extensionName);
+            var subDir = await SubdirectoryGenerator.Generate(query, form, headers, extensionName, request);
             var folder = Path.Combine(Configure.RootDirectory, subDir);
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
-            var fileName = await FileNameGenerator.Generate(query, form, headers, extensionName) + extensionName;
+            var fileName = await FileNameGenerator.Generate(query, form, headers, extensionName, request) + extensionName;
             var url = Path.Combine(folder, fileName);
             await using var writeStream = File.Create(url);
             if (fileSignature != null && fileSignature.Length > 0)

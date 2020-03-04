@@ -6,6 +6,6 @@ namespace UploadMiddleware.Core.Generators
 {
     public interface ISubdirectoryGenerator
     {
-        Task<string> Generate(IQueryCollection query, IFormCollection form, IHeaderDictionary headers, string extensionName);
+        Task<string> Generate(IQueryCollection query, IFormCollection form, IHeaderDictionary headers, string extensionName, HttpRequest request);
     }
 }

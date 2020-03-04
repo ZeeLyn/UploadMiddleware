@@ -5,6 +5,6 @@ namespace UploadMiddleware.Core.Processors
 {
     public interface IMergeProcessor
     {
-        Task<(bool Success, string FileName, string ErrorMsg)> Process(IQueryCollection query, IFormCollection form, IHeaderDictionary headers);
+        Task<(bool Success, string FileName, string ErrorMsg)> Process(IQueryCollection query, IFormCollection form, IHeaderDictionary headers, HttpRequest request);
     }
 }

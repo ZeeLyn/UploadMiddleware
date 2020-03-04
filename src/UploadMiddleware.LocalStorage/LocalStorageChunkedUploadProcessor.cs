@@ -21,7 +21,7 @@ namespace UploadMiddleware.LocalStorage
         }
 
         public async Task<(bool Success, UploadFileResult Result, string ErrorMessage)> Process(IQueryCollection query, IFormCollection form, IHeaderDictionary headers, Stream fileStream, string extensionName, string localFileName,
-            string sectionName)
+            string sectionName, HttpRequest request)
         {
             if (!headers.TryGetValue(ConstConfigs.FileMd5HeaderKey, out var md5))
                 return (false, null, $"未找到Header key:{ConstConfigs.FileMd5HeaderKey}.");
