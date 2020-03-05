@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using UploadMiddleware.Core.Common;
@@ -24,16 +24,13 @@ namespace UploadMiddleware.Core
 
         private UploadOptions Options { get; }
 
-        private IFileValidator FileValidator { get; }
+        private ILogger Logger { get; }
 
-        private UploadConfigure Configure { get; }
-
-        public UploadMiddleware(RequestDelegate next, IOptions<UploadOptions> options, IFileValidator fileValidator, UploadConfigure configure)
+        public UploadMiddleware(RequestDelegate next, IOptions<UploadOptions> options, ILogger<UploadMiddleware> logger)
         {
             Next = next;
             Options = options.Value;
-            FileValidator = fileValidator;
-            Configure = configure;
+            Logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -174,6 +171,7 @@ namespace UploadMiddleware.Core
                     catch (Exception e)
                     {
                         await context.Response.WriteResponseAsync(HttpStatusCode.BadRequest, e.Message);
+                        Logger.LogError(e, "An exception occurred while uploading the middleware.");
                     }
                     break;
                     #endregion
