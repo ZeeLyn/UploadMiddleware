@@ -5,7 +5,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var output=Argument<string>("output", "Output");
-var version=Argument<string>("version", "0.0.11");
+var version=Argument<string>("version", "0.0.12");
 var target = Argument<string>("target", "Default");
 var release = Argument<bool>("release", true);
 var nugetApiKey = Argument<string>("nugetApiKey", null);
@@ -82,6 +82,10 @@ Task("Push")
    if(currentBranch=="master")
    {
       foreach (var package in GetFiles("Output/*.nupkg"))
+      {
+         NuGetPush(package,nuGetPushSettings);
+      }
+      foreach (var package in GetFiles("Output/*.snupkg"))
       {
          NuGetPush(package,nuGetPushSettings);
       }
