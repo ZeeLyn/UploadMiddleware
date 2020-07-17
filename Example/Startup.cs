@@ -31,13 +31,13 @@ namespace Example
                 //options.AddUploadCompletedHandler<CustomUploadCompletedHandler>();
             });
 
-            services.AddChunkedUploadLocalStorage(options =>
-            {
-                options.AddAllowFileExtension(".zip", ".mp4");
-                options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
-                options.DeleteChunksOnMerged = true;
-                options.ChunksRootDirectory = Path.Combine(Configuration.GetSection("SaveRootDirectory").Value);
-            });
+            //services.AddChunkedUploadLocalStorage(options =>
+            //{
+            //    options.AddAllowFileExtension(".zip", ".mp4");
+            //    options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
+            //    options.DeleteChunksOnMerged = true;
+            //    options.ChunksRootDirectory = Path.Combine(Configuration.GetSection("SaveRootDirectory").Value);
+            //});
 
             //services.AddUploadAliyunOSS(options =>
             //{
