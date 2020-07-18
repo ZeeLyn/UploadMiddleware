@@ -5,32 +5,33 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Version>0.0.14</Version>
     <Authors>Owen</Authors>
+    <Description>Upload Middleware</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/1100100/UploadMiddleware</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/1100100/UploadMiddleware</RepositoryUrl>
-    <PackageTags>Upload,UploadMiddleware</PackageTags>
-    <Description>Upload Middleware</Description>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageIconUrl />
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <RepositoryUrl>https://github.com/1100100/UploadMiddleware</RepositoryUrl>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <PackageTags>Upload,UploadMiddleware</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <ProjectReference Include="..\UploadMiddleware.Core\UploadMiddleware.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <None Include="..\..\icon.png" Link="icon.png">
+      <PackagePath></PackagePath>
+      <Pack>True</Pack>
+    </None>
     <None Include="..\..\icon.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.6" />
+    <PackageReference Include="Tencent.QCloud.Cos.Sdk" Version="5.4.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UploadMiddleware.Core\UploadMiddleware.Core.csproj" />
   </ItemGroup>
 
 </Project>

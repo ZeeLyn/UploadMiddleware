@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\src\UploadMiddleware.AliyunOSS\UploadMiddleware.AliyunOSS.csproj" />
     <ProjectReference Include="..\src\UploadMiddleware.LocalStorage\UploadMiddleware.LocalStorage.csproj" />
+    <ProjectReference Include="..\src\UploadMiddleware.TencentCOS\UploadMiddleware.TencentCOS.csproj" />
   </ItemGroup>
 
 </Project>
