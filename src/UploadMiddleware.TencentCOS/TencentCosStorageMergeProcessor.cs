@@ -61,7 +61,7 @@ namespace UploadMiddleware.TencentCOS
                 if (resp.httpCode == 200)
                     MemoryCache.Remove(md5);
                 await Task.CompletedTask;
-                return (true, upload.Key, "");
+                return (true, "/" + upload.Key, "");
             }
             catch (CosServerException e)
             {
