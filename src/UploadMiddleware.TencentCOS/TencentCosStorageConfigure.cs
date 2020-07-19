@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Primitives;
 using UploadMiddleware.Core;
 using UploadMiddleware.Core.Handlers;
 using UploadMiddleware.Core.Processors;
@@ -76,7 +74,7 @@ namespace UploadMiddleware.TencentCOS
 
     }
 
-    public class PartUploadNotes
+    public class PartUploadRecording
     {
         public string UploadId { get; set; }
 

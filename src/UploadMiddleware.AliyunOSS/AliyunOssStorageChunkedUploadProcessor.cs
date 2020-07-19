@@ -1,23 +1,22 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using COSXML;
-using COSXML.CosException;
+using Aliyun.OSS;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using UploadMiddleware.Core;
 using UploadMiddleware.Core.Generators;
 using UploadMiddleware.Core.Processors;
 
-namespace UploadMiddleware.TencentCOS
+namespace UploadMiddleware.AliyunOSS
 {
-    public class TencentCosStorageChunkedUploadProcessor : IUploadProcessor
+    public class AliyunOssStorageChunkedUploadProcessor : IUploadProcessor
     {
-        private ChunkedUploadTencentCosStorageConfigure Configure { get; }
+        private ChunkedUploadAliyunOssStorageConfigure Configure { get; }
 
         private IFileValidator FileValidator { get; }
 
-        private CosXml Client { get; }
+        private IOss Client { get; }
 
         private IMemoryCache MemoryCache { get; }
 
@@ -25,7 +24,7 @@ namespace UploadMiddleware.TencentCOS
 
         private ISubdirectoryGenerator SubdirectoryGenerator { get; }
 
-        public TencentCosStorageChunkedUploadProcessor(ChunkedUploadTencentCosStorageConfigure configure, IFileValidator fileValidator, CosXmlServer client, IMemoryCache memoryCache, IFileNameGenerator fileNameGenerator, ISubdirectoryGenerator subdirectoryGenerator)
+        public AliyunOssStorageChunkedUploadProcessor(ChunkedUploadAliyunOssStorageConfigure configure, IFileValidator fileValidator, IOss client, IMemoryCache memoryCache, IFileNameGenerator fileNameGenerator, ISubdirectoryGenerator subdirectoryGenerator)
         {
             Configure = configure;
             FileValidator = fileValidator;
@@ -67,14 +66,13 @@ namespace UploadMiddleware.TencentCOS
                 var fileName = await FileNameGenerator.Generate(query, form, headers, extensionName, request) + extensionName;
                 var url = Path.Combine(folder, fileName).Replace("\\", "/");
 
-                var res = Client.InitMultipartUpload(
-                    new COSXML.Model.Object.InitMultipartUploadRequest(Configure.Bucket, url));
-                if (res.httpCode != 200)
-                    return (false, null, res.httpMessage);
+                var res = Client.InitiateMultipartUpload(new InitiateMultipartUploadRequest(Configure.BucketName, url));
+                if (res.HttpStatusCode != System.Net.HttpStatusCode.OK)
+                    return (false, null, res.HttpStatusCode.ToString());
 
                 PartUploadRecording = new PartUploadRecording
                 {
-                    UploadId = res.initMultipartUpload.uploadId,
+                    UploadId = res.UploadId,
                     Key = url
                 };
 
@@ -101,21 +99,23 @@ namespace UploadMiddleware.TencentCOS
             await fileStream.CopyToAsync(stream, Configure.BufferSize);
             stream.Seek(0, SeekOrigin.Begin);
 
-            var fileBytes = new byte[stream.Length];
-            await stream.ReadAsync(fileBytes);
-
             try
             {
-                var resp = Client.UploadPart(new COSXML.Model.Object.UploadPartRequest(Configure.Bucket, PartUploadRecording.Key, chunk + 1, PartUploadRecording.UploadId, fileBytes));
-                if (resp.httpCode != 200)
-                    return (false, null, resp.httpMessage);
+                var resp = Client.UploadPart(new UploadPartRequest(Configure.BucketName, PartUploadRecording.Key, PartUploadRecording.UploadId)
+                {
+                    InputStream = stream,
+                    PartSize = stream.Length,
+                    PartNumber = chunk + 1
+                });
+                if (resp.HttpStatusCode != System.Net.HttpStatusCode.OK)
+                    return (false, null, resp.HttpStatusCode.ToString());
 
-                PartUploadRecording.PartETag[chunk + 1] = resp.eTag;
+                PartUploadRecording.PartETag.Add(resp.PartETag);
                 return (true, new UploadFileResult { Name = sectionName, Url = "" }, "");
             }
-            catch (CosServerException e)
+            catch (Exception e)
             {
-                return (false, null, $"ErrorCode:{e.errorCode};ErrorMessage:{e.errorMessage}");
+                return (false, null, e.Message);
             }
         }
     }

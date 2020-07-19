@@ -1,23 +1,26 @@
-﻿using System.Threading.Tasks;
-using COSXML;
-using COSXML.CosException;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Aliyun.OSS;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using UploadMiddleware.Core;
+using UploadMiddleware.Core.Generators;
 using UploadMiddleware.Core.Processors;
 
-namespace UploadMiddleware.TencentCOS
+namespace UploadMiddleware.AliyunOSS
 {
-    public class TencentCosStorageMergeProcessor : IMergeProcessor
+    public class AliyunOssStorageMergeProcessor : IMergeProcessor
     {
-        private ChunkedUploadTencentCosStorageConfigure Configure { get; }
+        private ChunkedUploadAliyunOssStorageConfigure Configure { get; }
 
 
-        private CosXml Client { get; }
+        private IOss Client { get; }
 
         private IMemoryCache MemoryCache { get; }
 
-        public TencentCosStorageMergeProcessor(ChunkedUploadTencentCosStorageConfigure configure, CosXmlServer client, IMemoryCache memoryCache)
+        public AliyunOssStorageMergeProcessor(ChunkedUploadAliyunOssStorageConfigure configure, IOss client, IMemoryCache memoryCache)
         {
             Configure = configure;
             MemoryCache = memoryCache;
@@ -47,19 +50,22 @@ namespace UploadMiddleware.TencentCOS
                 return (false, "", "请先上传分片再合并");
             try
             {
-                var req =
-                    new COSXML.Model.Object.CompleteMultipartUploadRequest(Configure.Bucket, upload.Key,
+                var req = new CompleteMultipartUploadRequest(Configure.BucketName, upload.Key,
                         upload.UploadId);
-                req.SetPartNumberAndETag(upload.PartETag);
-                var resp = Client.CompleteMultiUpload(req);
-                if (resp.httpCode == 200)
-                    MemoryCache.Remove(md5);
+                foreach (var etag in upload.PartETag)
+                {
+                    req.PartETags.Add(etag);
+                }
+                var resp = Client.CompleteMultipartUpload(req);
+                if (resp.HttpStatusCode != System.Net.HttpStatusCode.OK)
+                    return (false, "", resp.HttpStatusCode.ToString());
+                MemoryCache.Remove(md5);
                 await Task.CompletedTask;
                 return (true, "/" + upload.Key, "");
             }
-            catch (CosServerException e)
+            catch (Exception e)
             {
-                return (false, "", $"ErrorCode:{e.errorCode};ErrorMessage:{e.errorMessage}");
+                return (false, "", e.Message);
             }
 
         }

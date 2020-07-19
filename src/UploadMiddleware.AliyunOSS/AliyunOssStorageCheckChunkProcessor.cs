@@ -1,21 +1,24 @@
-﻿using System.Linq;
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
-using COSXML;
+using Aliyun.OSS;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using UploadMiddleware.Core;
 using UploadMiddleware.Core.Processors;
 
-namespace UploadMiddleware.TencentCOS
+namespace UploadMiddleware.AliyunOSS
 {
-    public class TencentCosStorageCheckChunkProcessor : ICheckChunkProcessor
+    public class AliyunOssStorageCheckChunkProcessor : ICheckChunkProcessor
     {
         private static readonly MD5 Md5 = MD5.Create();
-        private ChunkedUploadTencentCosStorageConfigure Configure { get; }
+        private ChunkedUploadAliyunOssStorageConfigure Configure { get; }
         private IMemoryCache MemoryCache { get; }
-        private CosXml Client { get; }
-        public TencentCosStorageCheckChunkProcessor(ChunkedUploadTencentCosStorageConfigure configure, CosXmlServer client, IMemoryCache memoryCache)
+        private IOss Client { get; }
+        public AliyunOssStorageCheckChunkProcessor(ChunkedUploadAliyunOssStorageConfigure configure, IOss client, IMemoryCache memoryCache)
         {
             Configure = configure;
             MemoryCache = memoryCache;
@@ -77,15 +80,15 @@ namespace UploadMiddleware.TencentCOS
             }
             try
             {
-                var resp = Client.ListParts(new COSXML.Model.Object.ListPartsRequest(Configure.Bucket, upload.Key, upload.UploadId));
-                if (resp.httpCode != 200)
+                var resp = Client.ListParts(new ListPartsRequest(Configure.BucketName, upload.Key, upload.UploadId));
+                if (resp.HttpStatusCode != System.Net.HttpStatusCode.OK)
                     return await Task.FromResult(new ResponseResult
                     {
                         Content = new { exist = false }
                     });
                 return await Task.FromResult(new ResponseResult
                 {
-                    Content = new { exist = resp.listParts.parts.Any(p => p.partNumber == (chunk + 1).ToString()) }
+                    Content = new { exist = resp.Parts.Any(p => p.PartETag.PartNumber == chunk + 1) }
                 });
             }
             catch

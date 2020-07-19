@@ -1,20 +1,22 @@
-﻿using System.Threading.Tasks;
-using COSXML;
+﻿using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Aliyun.OSS;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using UploadMiddleware.Core;
 using UploadMiddleware.Core.Processors;
 
-namespace UploadMiddleware.TencentCOS
+namespace UploadMiddleware.AliyunOSS
 {
-    public class TencentCosStorageCheckChunksProcessor : ICheckChunksProcessor
+    public class AliyunOssStorageCheckChunksProcessor : ICheckChunksProcessor
     {
-        private ChunkedUploadTencentCosStorageConfigure Configure { get; }
+        private ChunkedUploadAliyunOssStorageConfigure Configure { get; }
 
         private IMemoryCache MemoryCache { get; }
-        private CosXml Client { get; }
+        private IOss Client { get; }
 
-        public TencentCosStorageCheckChunksProcessor(ChunkedUploadTencentCosStorageConfigure configure, CosXmlServer client, IMemoryCache memoryCache)
+        public AliyunOssStorageCheckChunksProcessor(ChunkedUploadAliyunOssStorageConfigure configure, IOss client, IMemoryCache memoryCache)
         {
             Configure = configure;
             MemoryCache = memoryCache;
@@ -51,11 +53,11 @@ namespace UploadMiddleware.TencentCOS
             }
             try
             {
-                var resp = Client.ListParts(new COSXML.Model.Object.ListPartsRequest(Configure.Bucket, upload.Key, upload.UploadId));
+                var resp = Client.ListParts(new ListPartsRequest(Configure.BucketName, upload.Key, upload.UploadId));
 
                 return await Task.FromResult(new ResponseResult
                 {
-                    Content = new { chunks = resp.listParts.parts.Count }
+                    Content = new { chunks = resp.Parts.Count() }
                 });
             }
             catch
