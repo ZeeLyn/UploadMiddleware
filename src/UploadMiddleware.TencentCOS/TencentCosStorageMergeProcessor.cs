@@ -17,7 +17,7 @@ namespace UploadMiddleware.TencentCOS
 
         private IMemoryCache MemoryCache { get; }
 
-        public TencentCosStorageMergeProcessor(ChunkedUploadTencentCosStorageConfigure configure, CosXmlServer client, IMemoryCache memoryCache)
+        public TencentCosStorageMergeProcessor(ChunkedUploadTencentCosStorageConfigure configure, CosXml client, IMemoryCache memoryCache)
         {
             Configure = configure;
             MemoryCache = memoryCache;

@@ -25,7 +25,7 @@ namespace UploadMiddleware.TencentCOS
 
         private ISubdirectoryGenerator SubdirectoryGenerator { get; }
 
-        public TencentCosStorageChunkedUploadProcessor(ChunkedUploadTencentCosStorageConfigure configure, IFileValidator fileValidator, CosXmlServer client, IMemoryCache memoryCache, IFileNameGenerator fileNameGenerator, ISubdirectoryGenerator subdirectoryGenerator)
+        public TencentCosStorageChunkedUploadProcessor(ChunkedUploadTencentCosStorageConfigure configure, IFileValidator fileValidator, CosXml client, IMemoryCache memoryCache, IFileNameGenerator fileNameGenerator, ISubdirectoryGenerator subdirectoryGenerator)
         {
             Configure = configure;
             FileValidator = fileValidator;

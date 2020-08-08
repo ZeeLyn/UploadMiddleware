@@ -32,13 +32,13 @@ namespace Example
             //    //options.AddUploadCompletedHandler<CustomUploadCompletedHandler>();
             //});
 
-            services.AddChunkedUploadLocalStorage(options =>
-            {
-                options.AddAllowFileExtension(".zip", ".mp4");
-                options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
-                options.DeleteChunksOnMerged = true;
-                options.ChunksRootDirectory = Path.Combine(Configuration.GetSection("SaveRootDirectory").Value);
-            });
+            //services.AddChunkedUploadLocalStorage(options =>
+            //{
+            //    options.AddAllowFileExtension(".zip", ".mp4");
+            //    options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
+            //    options.DeleteChunksOnMerged = true;
+            //    options.ChunksRootDirectory = Path.Combine(Configuration.GetSection("SaveRootDirectory").Value);
+            //});
 
             //services.AddUploadAliyunOSS(options =>
             //{
@@ -59,15 +59,15 @@ namespace Example
             //    options.AddAllowFileExtension("mp4", "mp3");
             //});
 
-            //services.AddChunkedUploadTencentCOS(options =>
-            //{
-            //    options.AppId = Configuration.GetValue<string>("COS:AppId");
-            //    options.SecretId = Configuration.GetValue<string>("COS:SecretId");
-            //    options.SecretKey = Configuration.GetValue<string>("COS:SecretKey");
-            //    options.Region = Configuration.GetValue<string>("COS:Region");
-            //    options.Bucket = Configuration.GetValue<string>("COS:Bucket");
-            //    options.AddAllowFileExtension("mp3", "mp4");
-            //});
+            services.AddChunkedUploadTencentCOS(options =>
+            {
+                options.AppId = Configuration.GetValue<string>("COS:AppId");
+                options.SecretId = Configuration.GetValue<string>("COS:SecretId");
+                options.SecretKey = Configuration.GetValue<string>("COS:SecretKey");
+                options.Region = Configuration.GetValue<string>("COS:Region");
+                options.Bucket = Configuration.GetValue<string>("COS:Bucket");
+                options.AddAllowFileExtension("mp3", "mp4");
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

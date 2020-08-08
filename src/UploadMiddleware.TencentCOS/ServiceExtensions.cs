@@ -53,7 +53,7 @@ namespace UploadMiddleware.TencentCOS
                 .SetDebugLog(false) //显示日志
                 .Build());
             services.AddSingleton<QCloudCredentialProvider>(sc => new DefaultQCloudCredentialProvider(configure.SecretId, configure.SecretKey, 600));
-            services.AddScoped(sc => new CosXmlServer(sc.GetRequiredService<CosXmlConfig>(), sc.GetRequiredService<QCloudCredentialProvider>()));
+            services.AddScoped<CosXml>(sc => new CosXmlServer(sc.GetRequiredService<CosXmlConfig>(), sc.GetRequiredService<QCloudCredentialProvider>()));
         }
     }
 }

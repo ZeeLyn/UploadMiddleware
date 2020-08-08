@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using COSXML;
-using COSXML.Auth;
 using COSXML.Model.Object;
 using Microsoft.AspNetCore.Http;
 using UploadMiddleware.Core;
@@ -23,10 +22,10 @@ namespace UploadMiddleware.TencentCOS
         private IFileValidator FileValidator { get; }
 
 
-        public TencentCosStorageUploadProcessor(TencentCosStorageConfigure configure, CosXmlConfig cosXmlConfig, QCloudCredentialProvider qCloudCredentialProvider, IFileNameGenerator fileNameGenerator, ISubdirectoryGenerator subdirectoryGenerator, IFileValidator fileValidator)
+        public TencentCosStorageUploadProcessor(TencentCosStorageConfigure configure, CosXml client, IFileNameGenerator fileNameGenerator, ISubdirectoryGenerator subdirectoryGenerator, IFileValidator fileValidator)
         {
             Configure = configure;
-            Client = new CosXmlServer(cosXmlConfig, qCloudCredentialProvider);
+            Client = client;
             FileNameGenerator = fileNameGenerator;
             SubdirectoryGenerator = subdirectoryGenerator;
             FileValidator = fileValidator;
