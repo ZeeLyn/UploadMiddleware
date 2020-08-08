@@ -25,12 +25,12 @@ namespace Example
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews(options => { options.Filters.Add<GlobalFilter>(); });
-            //services.AddUploadLocalStorage(options =>
-            //{
-            //    options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
-            //    options.AddAllowFileExtension(".mp4");
-            //    //options.AddUploadCompletedHandler<CustomUploadCompletedHandler>();
-            //});
+            services.AddUploadLocalStorage(options =>
+            {
+                options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
+                options.AddAllowFileExtension(".mp4");
+                //options.AddUploadCompletedHandler<CustomUploadCompletedHandler>();
+            });
 
             //services.AddChunkedUploadLocalStorage(options =>
             //{
@@ -59,15 +59,15 @@ namespace Example
             //    options.AddAllowFileExtension("mp4", "mp3");
             //});
 
-            services.AddChunkedUploadTencentCOS(options =>
-            {
-                options.AppId = Configuration.GetValue<string>("COS:AppId");
-                options.SecretId = Configuration.GetValue<string>("COS:SecretId");
-                options.SecretKey = Configuration.GetValue<string>("COS:SecretKey");
-                options.Region = Configuration.GetValue<string>("COS:Region");
-                options.Bucket = Configuration.GetValue<string>("COS:Bucket");
-                options.AddAllowFileExtension("mp3", "mp4");
-            });
+            //services.AddChunkedUploadTencentCOS(options =>
+            //{
+            //    options.AppId = Configuration.GetValue<string>("COS:AppId");
+            //    options.SecretId = Configuration.GetValue<string>("COS:SecretId");
+            //    options.SecretKey = Configuration.GetValue<string>("COS:SecretKey");
+            //    options.Region = Configuration.GetValue<string>("COS:Region");
+            //    options.Bucket = Configuration.GetValue<string>("COS:Bucket");
+            //    options.AddAllowFileExtension("mp3", "mp4");
+            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
