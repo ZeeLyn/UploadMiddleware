@@ -25,20 +25,20 @@ namespace Example
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews(options => { options.Filters.Add<GlobalFilter>(); });
-            services.AddUploadLocalStorage(options =>
-            {
-                options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
-                options.AddAllowFileExtension(".mp4");
-                //options.AddUploadCompletedHandler<CustomUploadCompletedHandler>();
-            });
-
-            //services.AddChunkedUploadLocalStorage(options =>
+            //services.AddUploadLocalStorage(options =>
             //{
-            //    options.AddAllowFileExtension(".zip", ".mp4");
             //    options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
-            //    options.DeleteChunksOnMerged = true;
-            //    options.ChunksRootDirectory = Path.Combine(Configuration.GetSection("SaveRootDirectory").Value);
+            //    options.AddAllowFileExtension(".mp4");
+            //    //options.AddUploadCompletedHandler<CustomUploadCompletedHandler>();
             //});
+
+            services.AddChunkedUploadLocalStorage(options =>
+            {
+                options.AddAllowFileExtension(".zip", ".mp4", "ppt", "pptx");
+                options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
+                options.DeleteChunksOnMerged = true;
+                options.ChunksRootDirectory = Path.Combine(Configuration.GetSection("SaveRootDirectory").Value);
+            });
 
             //services.AddUploadAliyunOSS(options =>
             //{

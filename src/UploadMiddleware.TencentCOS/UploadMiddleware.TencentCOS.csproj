@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>0.1.1</Version>
+    <Version>0.1.2</Version>
     <Authors>Owen</Authors>
     <Description>Upload Middleware</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -26,8 +26,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.6" />
-    <PackageReference Include="Tencent.QCloud.Cos.Sdk" Version="5.4.11" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.8" />
+    <PackageReference Include="Tencent.QCloud.Cos.Sdk" Version="5.4.13" />
   </ItemGroup>
 
   <ItemGroup>

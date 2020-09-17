@@ -61,7 +61,7 @@ namespace UploadMiddleware.LocalStorage
             var chunksFolder = Path.Combine(string.IsNullOrWhiteSpace(Configure.ChunksRootDirectory) ? Configure.RootDirectory : Configure.ChunksRootDirectory, TempFolder, md5);
             if (!Directory.Exists(chunksFolder))
                 Directory.CreateDirectory(chunksFolder);
-            var fileName = chunk + extensionName + ".$chunk";
+            var fileName = $"{chunk:D5}" + extensionName + ".$chunk";
             var url = Path.Combine(chunksFolder, fileName);
             await using var writeStream = new FileStream(url, FileMode.Create);
             if (signature != null && signature.Length > 0)

@@ -93,7 +93,7 @@ if (window.WebUploader) {
             },
             accept: {
                 title: 'Images',
-                extensions: 'gif,jpg,jpeg,bmp,png,mp3,mp4',
+                extensions: 'gif,jpg,jpeg,bmp,png,mp3,mp4,ppt,pptx',
                 mimeTypes: 'image/*'
             },
             translation: {
