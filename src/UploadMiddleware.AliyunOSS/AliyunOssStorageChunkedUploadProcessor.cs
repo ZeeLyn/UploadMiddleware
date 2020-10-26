@@ -66,7 +66,15 @@ namespace UploadMiddleware.AliyunOSS
                 var fileName = await FileNameGenerator.Generate(query, form, headers, extensionName, request) + extensionName;
                 var url = Path.Combine(folder, fileName).Replace("\\", "/");
 
-                var res = Client.InitiateMultipartUpload(new InitiateMultipartUploadRequest(Configure.BucketName, url));
+                if (!Configure.Metadata.TryGetValue(extensionName, out var meta))
+                {
+                    meta = new ObjectMetadata { ContentType = "application/octet-stream" };
+                }
+
+                var res = Client.InitiateMultipartUpload(new InitiateMultipartUploadRequest(Configure.BucketName, url)
+                {
+                    ObjectMetadata = meta
+                });
                 if (res.HttpStatusCode != System.Net.HttpStatusCode.OK)
                     return (false, null, res.HttpStatusCode.ToString());
 

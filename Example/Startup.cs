@@ -32,13 +32,13 @@ namespace Example
             //    //options.AddUploadCompletedHandler<CustomUploadCompletedHandler>();
             //});
 
-            services.AddChunkedUploadLocalStorage(options =>
-            {
-                options.AddAllowFileExtension(".zip", ".mp4", "ppt", "pptx");
-                options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
-                options.DeleteChunksOnMerged = true;
-                options.ChunksRootDirectory = Path.Combine(Configuration.GetSection("SaveRootDirectory").Value);
-            });
+            //services.AddChunkedUploadLocalStorage(options =>
+            //{
+            //    options.AddAllowFileExtension(".zip", ".mp4", "ppt", "pptx");
+            //    options.RootDirectory = Configuration.GetSection("SaveRootDirectory").Value;
+            //    options.DeleteChunksOnMerged = true;
+            //    options.ChunksRootDirectory = Path.Combine(Configuration.GetSection("SaveRootDirectory").Value);
+            //});
 
             //services.AddUploadAliyunOSS(options =>
             //{
@@ -49,15 +49,15 @@ namespace Example
             //    options.RootDirectory = Configuration.GetSection("OSS:RootDirectory").Value;
             //});
 
-            //services.AddChunkedUploadAliyunOSS(options =>
-            //{
-            //    options.AccessId = Configuration.GetSection("OSS:AccessId").Value;
-            //    options.AccessKeySecret = Configuration.GetSection("OSS:AccessKeySecret").Value;
-            //    options.BucketName = Configuration.GetSection("OSS:BucketName").Value;
-            //    options.Endpoint = Configuration.GetSection("OSS:Endpoint").Value;
-            //    options.RootDirectory = Configuration.GetSection("OSS:RootDirectory").Value;
-            //    options.AddAllowFileExtension("mp4", "mp3");
-            //});
+            services.AddChunkedUploadAliyunOSS(options =>
+            {
+                options.AccessId = Configuration.GetSection("OSS:AccessId").Value;
+                options.AccessKeySecret = Configuration.GetSection("OSS:AccessKeySecret").Value;
+                options.BucketName = Configuration.GetSection("OSS:BucketName").Value;
+                options.Endpoint = Configuration.GetSection("OSS:Endpoint").Value;
+                options.RootDirectory = Configuration.GetSection("OSS:RootDirectory").Value;
+                options.AddAllowFileExtension("mp4", "mp3");
+            });
 
             //services.AddChunkedUploadTencentCOS(options =>
             //{

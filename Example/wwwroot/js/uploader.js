@@ -106,7 +106,7 @@ if (window.WebUploader) {
             },
             compress: false,
             formData: null,
-            fileNumLimit: 1,
+            fileNumLimit: 100,
             fileSingleSizeLimit: 1024 * 1024 * 1000,
             threads: 1,
             thumb: {

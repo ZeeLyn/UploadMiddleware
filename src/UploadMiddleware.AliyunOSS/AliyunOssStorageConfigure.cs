@@ -53,7 +53,8 @@ namespace UploadMiddleware.AliyunOSS
             },
             {".jpeg", new ObjectMetadata {ContentType = "image/jpeg"}},
             {".gif", new ObjectMetadata {ContentType = "image/gif"}},
-            {".png", new ObjectMetadata {ContentType = "image/png"}}
+            {".png", new ObjectMetadata {ContentType = "image/png"}},
+            {".mp4", new ObjectMetadata {ContentType = "video/mpeg4"}}
         };
     }
 
