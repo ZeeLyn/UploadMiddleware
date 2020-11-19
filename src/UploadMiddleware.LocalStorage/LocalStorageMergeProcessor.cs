@@ -2,8 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using UploadMiddleware.Core;
 using UploadMiddleware.Core.Generators;
+using UploadMiddleware.Core.Handlers;
 using UploadMiddleware.Core.Processors;
 
 namespace UploadMiddleware.LocalStorage
@@ -70,10 +72,30 @@ namespace UploadMiddleware.LocalStorage
                     await readStream.CopyToAsync(writeStream, Configure.BufferSize);
                 }
             }
+
+            var serverUrl = Path.Combine("/", subDir, fileName).Replace("\\", "/");
+
+            var localFileName = "";
+            var infoPath = Path.Combine(chunksDir, "info");
+            if (File.Exists(infoPath))
+                localFileName = await File.ReadAllTextAsync(infoPath);
+
+
             if (Configure.DeleteChunksOnMerged)
                 Directory.Delete(chunksDir, true);
 
-            return (true, Path.Combine("/", subDir, fileName).Replace("\\", "/"), "");
+            try
+            {
+                var callback = request.HttpContext.RequestServices.GetService<IUploadCompletedCallbackHandler>();
+                if (callback != null)
+                    await callback.OnCompletedAsync(serverUrl, localFileName);
+            }
+            catch
+            {
+                // ignored
+            }
+
+            return (true, serverUrl, "");
         }
     }
 }

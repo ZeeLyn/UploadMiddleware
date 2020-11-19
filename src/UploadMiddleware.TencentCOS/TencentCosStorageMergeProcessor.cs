@@ -3,7 +3,9 @@ using COSXML;
 using COSXML.CosException;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using UploadMiddleware.Core;
+using UploadMiddleware.Core.Handlers;
 using UploadMiddleware.Core.Processors;
 
 namespace UploadMiddleware.TencentCOS
@@ -52,10 +54,21 @@ namespace UploadMiddleware.TencentCOS
                         upload.UploadId);
                 req.SetPartNumberAndETag(upload.PartETag);
                 var resp = Client.CompleteMultiUpload(req);
-                if (resp.httpCode == 200)
-                    MemoryCache.Remove(md5);
-                await Task.CompletedTask;
-                return (true, "/" + upload.Key, "");
+
+                var serverPath = "/" + upload.Key;
+                try
+                {
+                    var callback = request.HttpContext.RequestServices.GetService<IUploadCompletedCallbackHandler>();
+                    if (callback != null)
+                        await callback.OnCompletedAsync(serverPath, upload.LocalFileName);
+                }
+                finally
+                {
+                    if (resp.httpCode == 200)
+                        MemoryCache.Remove(md5);
+                }
+
+                return (true, serverPath, "");
             }
             catch (CosServerException e)
             {

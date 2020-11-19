@@ -75,7 +75,8 @@ namespace UploadMiddleware.TencentCOS
                 PartUploadRecording = new PartUploadRecording
                 {
                     UploadId = res.initMultipartUpload.uploadId,
-                    Key = url
+                    Key = url,
+                    LocalFileName = localFileName
                 };
 
                 MemoryCache.Set(md5, PartUploadRecording, TimeSpan.FromHours(2));

@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using Aliyun.OSS;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using UploadMiddleware.Core;
 using UploadMiddleware.Core.Generators;
+using UploadMiddleware.Core.Handlers;
 using UploadMiddleware.Core.Processors;
 
 namespace UploadMiddleware.AliyunOSS
@@ -59,9 +61,21 @@ namespace UploadMiddleware.AliyunOSS
                 var resp = Client.CompleteMultipartUpload(req);
                 if (resp.HttpStatusCode != System.Net.HttpStatusCode.OK)
                     return (false, "", resp.HttpStatusCode.ToString());
-                MemoryCache.Remove(md5);
-                await Task.CompletedTask;
-                return (true, "/" + upload.Key, "");
+
+                //await Task.CompletedTask;
+                var fileName = "/" + upload.Key;
+                try
+                {
+                    var callback = request.HttpContext.RequestServices.GetService<IUploadCompletedCallbackHandler>();
+                    if (callback != null)
+                        await callback.OnCompletedAsync(fileName, upload.LocalFileName);
+                }
+                finally
+                {
+                    MemoryCache.Remove(md5);
+                }
+
+                return (true, fileName, "");
             }
             catch (Exception e)
             {

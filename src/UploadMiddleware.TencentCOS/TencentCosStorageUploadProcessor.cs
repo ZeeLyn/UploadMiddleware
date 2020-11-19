@@ -3,8 +3,10 @@ using System.Threading.Tasks;
 using COSXML;
 using COSXML.Model.Object;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using UploadMiddleware.Core;
 using UploadMiddleware.Core.Generators;
+using UploadMiddleware.Core.Handlers;
 using UploadMiddleware.Core.Processors;
 
 namespace UploadMiddleware.TencentCOS
@@ -55,7 +57,18 @@ namespace UploadMiddleware.TencentCOS
             var resp = Client.PutObject(req);
             if (resp.httpCode != 200)
                 return (false, null, resp.httpMessage);
-            return (true, new UploadFileResult { Name = sectionName, Url = "/" + url }, "");
+            var serverPath = "/" + url;
+            try
+            {
+                var callback = request.HttpContext.RequestServices.GetService<IUploadCompletedCallbackHandler>();
+                if (callback != null)
+                    await callback.OnCompletedAsync(serverPath, localFileName);
+            }
+            catch
+            {
+                // ignored
+            }
+            return (true, new UploadFileResult { Name = sectionName, Url = serverPath }, "");
         }
     }
 }

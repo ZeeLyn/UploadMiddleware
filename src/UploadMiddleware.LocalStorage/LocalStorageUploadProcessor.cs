@@ -1,8 +1,10 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using UploadMiddleware.Core;
 using UploadMiddleware.Core.Generators;
+using UploadMiddleware.Core.Handlers;
 using UploadMiddleware.Core.Processors;
 
 namespace UploadMiddleware.LocalStorage
@@ -40,7 +42,21 @@ namespace UploadMiddleware.LocalStorage
             if (fileSignature != null && fileSignature.Length > 0)
                 writeStream.Write(fileSignature, 0, fileSignature.Length);
             await fileStream.CopyToAsync(writeStream, Configure.BufferSize);
-            return (true, new UploadFileResult { Name = sectionName, Url = Path.Combine("/", subDir, fileName).Replace("\\", "/") }, "");
+
+            var serverFileName = Path.Combine("/", subDir, fileName).Replace("\\", "/");
+
+            try
+            {
+                var callback = request.HttpContext.RequestServices.GetService<IUploadCompletedCallbackHandler>();
+                if (callback != null)
+                    await callback.OnCompletedAsync(serverFileName, localFileName);
+            }
+            catch
+            {
+                // ignored
+            }
+
+            return (true, new UploadFileResult { Name = sectionName, Url = serverFileName }, "");
         }
     }
 }

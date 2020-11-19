@@ -80,6 +80,8 @@ namespace UploadMiddleware.TencentCOS
 
         public string Key { get; set; }
 
+        public string LocalFileName { get; set; }
+
         public Dictionary<int, string> PartETag { get; set; } = new Dictionary<int, string>();
     }
 }

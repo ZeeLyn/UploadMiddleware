@@ -116,5 +116,15 @@ namespace UploadMiddleware.Core
         {
             return Services.AddSingleton(typeof(IFileNameGenerator), typeof(TFileNameGenerator));
         }
+
+        /// <summary>
+        /// 添加上传完成回调处理器
+        /// </summary>
+        /// <typeparam name="TCallback"></typeparam>
+        /// <returns></returns>
+        public IServiceCollection AddCompletedCallBack<TCallback>() where TCallback : IUploadCompletedCallbackHandler
+        {
+            return Services.AddScoped(typeof(IUploadCompletedCallbackHandler), typeof(TCallback));
+        }
     }
 }

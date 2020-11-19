@@ -2,8 +2,10 @@
 using System.Threading.Tasks;
 using Aliyun.OSS;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using UploadMiddleware.Core;
 using UploadMiddleware.Core.Generators;
+using UploadMiddleware.Core.Handlers;
 using UploadMiddleware.Core.Processors;
 
 namespace UploadMiddleware.AliyunOSS
@@ -63,7 +65,20 @@ namespace UploadMiddleware.AliyunOSS
 
             Client.PutObject(Configure.BucketName, url, stream, meta);
 
-            return (true, new UploadFileResult { Name = sectionName, Url = "/" + url }, "");
+            var serverPath = "/" + url;
+
+            try
+            {
+                var callback = request.HttpContext.RequestServices.GetService<IUploadCompletedCallbackHandler>();
+                if (callback != null)
+                    await callback.OnCompletedAsync(serverPath, localFileName);
+            }
+            catch
+            {
+                // ignored
+            }
+
+            return (true, new UploadFileResult { Name = sectionName, Url = serverPath }, "");
         }
     }
 }

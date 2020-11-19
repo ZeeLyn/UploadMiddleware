@@ -113,6 +113,8 @@ namespace UploadMiddleware.AliyunOSS
 
         public string Key { get; set; }
 
+        public string LocalFileName { get; set; }
+
         public List<PartETag> PartETag { get; set; } = new List<PartETag>();
     }
 

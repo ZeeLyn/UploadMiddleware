@@ -80,6 +80,7 @@ namespace UploadMiddleware.AliyunOSS
 
                 PartUploadRecording = new PartUploadRecording
                 {
+                    LocalFileName = localFileName,
                     UploadId = res.UploadId,
                     Key = url
                 };

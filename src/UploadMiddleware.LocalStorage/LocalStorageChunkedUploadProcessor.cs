@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using UploadMiddleware.Core;
@@ -61,6 +62,13 @@ namespace UploadMiddleware.LocalStorage
             var chunksFolder = Path.Combine(string.IsNullOrWhiteSpace(Configure.ChunksRootDirectory) ? Configure.RootDirectory : Configure.ChunksRootDirectory, TempFolder, md5);
             if (!Directory.Exists(chunksFolder))
                 Directory.CreateDirectory(chunksFolder);
+
+            if (chunk == 0)
+            {
+                var infoFileName = Path.Combine(chunksFolder, "info");
+                await File.WriteAllTextAsync(infoFileName, localFileName, Encoding.UTF8);
+            }
+
             var fileName = $"{chunk:D5}" + extensionName + ".$chunk";
             var url = Path.Combine(chunksFolder, fileName);
             await using var writeStream = new FileStream(url, FileMode.Create);
