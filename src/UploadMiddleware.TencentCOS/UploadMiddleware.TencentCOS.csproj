@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>0.1.3</Version>
+    <Version>0.2.0</Version>
     <Authors>Owen</Authors>
     <Description>Upload Middleware</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
