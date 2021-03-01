@@ -60,7 +60,7 @@ namespace UploadMiddleware.TencentCOS
                 {
                     var callback = request.HttpContext.RequestServices.GetService<IUploadCompletedCallbackHandler>();
                     if (callback != null)
-                        await callback.OnCompletedAsync(serverPath, upload.LocalFileName);
+                        await callback.OnCompletedAsync(serverPath, upload.LocalFileName, request);
                 }
                 finally
                 {

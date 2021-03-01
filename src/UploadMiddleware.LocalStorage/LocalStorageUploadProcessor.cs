@@ -49,7 +49,7 @@ namespace UploadMiddleware.LocalStorage
             {
                 var callback = request.HttpContext.RequestServices.GetService<IUploadCompletedCallbackHandler>();
                 if (callback != null)
-                    await callback.OnCompletedAsync(serverFileName, localFileName);
+                    await callback.OnCompletedAsync(serverFileName, localFileName, request);
             }
             catch
             {

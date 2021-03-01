@@ -68,7 +68,7 @@ namespace UploadMiddleware.AliyunOSS
                 {
                     var callback = request.HttpContext.RequestServices.GetService<IUploadCompletedCallbackHandler>();
                     if (callback != null)
-                        await callback.OnCompletedAsync(fileName, upload.LocalFileName);
+                        await callback.OnCompletedAsync(fileName, upload.LocalFileName, request);
                 }
                 finally
                 {
