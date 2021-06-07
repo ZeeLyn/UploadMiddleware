@@ -37,6 +37,7 @@ namespace UploadMiddleware.AliyunOSS
             var config = new ChunkedUploadAliyunOssStorageConfigure(services);
             options?.Invoke(config);
             services.AddSingleton(config);
+            services.AddMemoryCache();
             services.AddSingleton<IOss>(string.IsNullOrWhiteSpace(config.SecurityToken) ? new OssClient(config.Endpoint, config.AccessId, config.AccessKeySecret) : new OssClient(config.Endpoint, config.AccessId, config.AccessKeySecret, config.SecurityToken));
             services.AddSingleton<UploadConfigure>(config);
             return services;
